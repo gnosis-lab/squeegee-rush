@@ -7,6 +7,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#07010a">
+  <!-- squeegee-rush v4 -->
   <title>SQUEEGEE RUSH — Ami Merchant Studios</title>
   <style>
 :root { --pad: env(safe-area-inset-bottom, 0px); }
@@ -271,10 +272,15 @@ html, body {
     3: { id: 3, name: "GALLERY", tag: "OPENING NIGHT", time: 65, solid: true, style: "marble", can: 1.25, bub: 4.0, critic: true, gaps: false }
   };
 
+  const GAME_VER = "v4";
+
   const OUTFITS = [
     { id: "classic", name: "CLASSIC BLACK", short: "CLASSIC", price: 0, pack: null },
     { id: "overalls", name: "SPLATTERED OVERALLS", short: "OVERALLS", price: 150, pack: null },
     { id: "hoodie", name: "LA HOODIE", short: "HOODIE", price: 300, pack: null },
+    { id: "smock", name: "PAINT SMOCK", short: "SMOCK", price: 350, pack: null },
+    { id: "summer", name: "SUMMER FIT", short: "SUMMER", price: 280, pack: null },
+    { id: "varsity", name: "VARSITY JACKET", short: "VARSITY", price: 450, pack: null },
     { id: "neon", name: "NEON NIGHT", short: "NEON", price: 600, pack: null },
     { id: "rainbow", name: "RAINBOW FIT", short: "RAINBOW", price: 0, pack: "painter" },
     { id: "gold", name: "GOLD DRIP", short: "GOLD", price: 0, pack: "founder" }
@@ -283,22 +289,81 @@ html, body {
     { id: "ami", name: "AMI", short: "AMI", price: 0, pack: null, acc: [] },
     { id: "drip", name: "DRIP KID", short: "DRIP", price: 400, pack: "painter", acc: ["beanie", "shades", "chain"] },
     { id: "critic", name: "THE CRITIC", short: "CRITIC", price: 0, pack: "painter", beat: 3, acc: ["bucket", "shades"] },
+    { id: "fresh", name: "FRESH COAT", short: "FRESH", price: 550, pack: null, acc: [] },
+    { id: "shadow", name: "SHADOW AMI", short: "SHADOW", price: 750, pack: null, acc: [] },
     { id: "golden", name: "GOLDEN AMI", short: "GOLDEN", price: 0, pack: "founder", acc: ["shades", "chain"] }
   ];
   const SQUEEGEES = [
     { id: "classic", name: "CLASSIC SQUEEGEE", short: "CLASSIC", price: 0, pack: null },
     { id: "neon", name: "NEON SQUEEGEE", short: "NEON", price: 250, pack: null },
+    { id: "ice", name: "ICE SQUEEGEE", short: "ICE", price: 450, pack: null },
+    { id: "graffiti", name: "GRAFFITI SQUEEGEE", short: "GRAFF", price: 550, pack: null },
+    { id: "lightning", name: "LIGHTNING SQUEEGEE", short: "BOLT", price: 700, pack: null },
     { id: "fire", name: "FIRE SQUEEGEE", short: "FIRE", price: 800, pack: null },
+    { id: "diamond", name: "DIAMOND SQUEEGEE", short: "DIAMOND", price: 0, pack: "founder" },
     { id: "gold", name: "GOLD SQUEEGEE", short: "GOLD", price: 0, pack: "founder" }
   ];
   const TRAILS = [
     { id: "rainbow", name: "RAINBOW TRAIL", short: "RAINBOW", price: 0, pack: null },
     { id: "galaxy", name: "GALAXY TRAIL", short: "GALAXY", price: 200, pack: null },
+    { id: "hearts", name: "HEARTS TRAIL", short: "HEARTS", price: 300, pack: null },
     { id: "money", name: "MONEY TRAIL", short: "MONEY", price: 350, pack: null },
-    { id: "fire", name: "FIRE TRAIL", short: "FIRE", price: 500, pack: null }
+    { id: "confetti", name: "PIXEL CONFETTI", short: "CONFETTI", price: 400, pack: null },
+    { id: "fire", name: "FIRE TRAIL", short: "FIRE", price: 500, pack: null },
+    { id: "lightning", name: "LIGHTNING TRAIL", short: "BOLT", price: 650, pack: null }
   ];
+  const SHADES = [
+    { id: "none", name: "NO SHADES", short: "NONE", price: 0, pack: null },
+    { id: "black", name: "BLACK SHADES", short: "BLACK", price: 150, pack: null },
+    { id: "pink", name: "PINK SHADES", short: "PINK", price: 220, pack: null },
+    { id: "neon", name: "NEON SHADES", short: "NEON", price: 250, pack: null },
+    { id: "heart", name: "HEART SHADES", short: "HEART", price: 320, pack: null },
+    { id: "gold", name: "GOLD SHADES", short: "GOLD", price: 0, pack: "founder" }
+  ];
+  const HATS = [
+    { id: "cap", name: "CLASSIC CAP", short: "CAP", price: 0, pack: null },
+    { id: "cap_red", name: "RED CAP", short: "RED CAP", price: 120, pack: null },
+    { id: "cap_blue", name: "BLUE CAP", short: "BLUE CAP", price: 120, pack: null },
+    { id: "beanie", name: "RED BEANIE", short: "BEANIE", price: 180, pack: null },
+    { id: "bucket", name: "BUCKET HAT", short: "BUCKET", price: 220, pack: null },
+    { id: "crown", name: "FOUNDER CROWN", short: "CROWN", price: 0, pack: "founder" }
+  ];
+  const CHAINS = [
+    { id: "none", name: "NO CHAIN", short: "NONE", price: 0, pack: null },
+    { id: "silver", name: "SILVER CHAIN", short: "SILVER", price: 180, pack: null },
+    { id: "gold", name: "GOLD CHAIN", short: "GOLD", price: 0, pack: "founder" }
+  ];
+  const EMOTES = [
+    { id: "wave", name: "VICTORY WAVE", short: "WAVE", price: 0, pack: null },
+    { id: "spin", name: "SPIN OUT", short: "SPIN", price: 200, pack: null },
+    { id: "flex", name: "FLEX", short: "FLEX", price: 250, pack: null },
+    { id: "moonwalk", name: "MOONWALK", short: "MOON", price: 400, pack: null },
+    { id: "goldpose", name: "FOUNDER POSE", short: "POSE", price: 0, pack: "founder" }
+  ];
+  const CATALOGS = {
+    outfits: OUTFITS, painters: PAINTERS, squeegees: SQUEEGEES, trails: TRAILS,
+    shades: SHADES, hats: HATS, chains: CHAINS, emotes: EMOTES
+  };
+  const EQUIP_KEY = {
+    outfits: "outfit", painters: "painter", squeegees: "squeegee", trails: "trail",
+    shades: "shades", hats: "hat", chains: "chain", emotes: "emote"
+  };
+  const POSE = {
+    idle:    { eyeX: 1,  eyeY: -86, capTop: -109, capBot: -94, faceBot: -72, shirtBot: -36, headW: 22 },
+    walk0:   { eyeX: 5,  eyeY: -83, capTop: -106, capBot: -92, faceBot: -70, shirtBot: -34, headW: 22 },
+    walk1:   { eyeX: 5,  eyeY: -83, capTop: -106, capBot: -92, faceBot: -70, shirtBot: -34, headW: 22 },
+    walk2:   { eyeX: 5,  eyeY: -83, capTop: -106, capBot: -92, faceBot: -70, shirtBot: -34, headW: 22 },
+    walk3:   { eyeX: 5,  eyeY: -83, capTop: -106, capBot: -92, faceBot: -70, shirtBot: -34, headW: 22 },
+    jump:    { eyeX: 20, eyeY: -63, capTop: -88,  capBot: -70, faceBot: -50, shirtBot: -22, headW: 24 },
+    victory: { eyeX: -1, eyeY: -89, capTop: -115, capBot: -100, faceBot: -76, shirtBot: -38, headW: 22 },
+    swipe0:  { eyeX: 1,  eyeY: -69, capTop: -93,  capBot: -76, faceBot: -56, shirtBot: -28, headW: 22 },
+    swipe1:  { eyeX: 2,  eyeY: -72, capTop: -96,  capBot: -78, faceBot: -58, shirtBot: -28, headW: 22 },
+    swipe2:  { eyeX: 2,  eyeY: -71, capTop: -97,  capBot: -79, faceBot: -58, shirtBot: -28, headW: 22 },
+    swipe3:  { eyeX: 3,  eyeY: -68, capTop: -91,  capBot: -76, faceBot: -56, shirtBot: -26, headW: 22 }
+  };
+  function poseOf(name) { return POSE[name] || POSE.idle; }
 
-  function digest(str) {
+    function digest(str) {
     str = "sr:" + String(str).toUpperCase().replace(/\s+/g, "");
     let h = 2166136261;
     for (let i = 0; i < str.length; i++) {
@@ -318,8 +383,8 @@ html, body {
       unlocked: 1,
       best: { 1: 0, 2: 0, 3: 0 },
       coins: 0,
-      owned: { outfits: ["classic"], painters: ["ami"], squeegees: ["classic"], trails: ["rainbow"] },
-      equipped: { outfit: "classic", painter: "ami", squeegee: "classic", trail: "rainbow" },
+      owned: { outfits: ["classic"], painters: ["ami"], squeegees: ["classic"], trails: ["rainbow"], shades: ["none"], hats: ["cap"], chains: ["none"], emotes: ["wave"] },
+      equipped: { outfit: "classic", painter: "ami", squeegee: "classic", trail: "rainbow", shades: "none", hat: "cap", chain: "none", emote: "wave" },
       packs: { painter: false, founder: false },
       lastLogin: "",
       firstWin: { 1: false, 2: false, 3: false },
@@ -378,6 +443,8 @@ html, body {
   let shopMsgT = 0;
   let lockerTab = "fits";
   let lockerIndex = 0;
+  let tryIt = { on: false, t: 0, kind: "", _lastSpawn: -1 };
+  let tryFx = [];
   let selectedLevel = 1;
   let currentLevel = 1;
   let introT = 0;
@@ -528,17 +595,23 @@ html, body {
   }
 
   function findItem(type, id) {
-    const list = type === "outfits" ? OUTFITS : type === "painters" ? PAINTERS : type === "squeegees" ? SQUEEGEES : TRAILS;
+    const list = CATALOGS[type] || [];
     for (let i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
     return null;
   }
 
   function catalogFor(tab) {
-    if (tab === "fits") return OUTFITS.map(function (x) { return { type: "outfits", item: x }; });
-    if (tab === "faces") return PAINTERS.map(function (x) { return { type: "painters", item: x }; });
-    if (tab === "gear") {
-      return SQUEEGEES.map(function (x) { return { type: "squeegees", item: x }; })
-        .concat(TRAILS.map(function (x) { return { type: "trails", item: x }; }));
+    function mapList(list, type) {
+      return list.map(function (x) { return { type: type, item: x }; });
+    }
+    if (tab === "fits") return mapList(OUTFITS, "outfits");
+    if (tab === "faces") return mapList(PAINTERS, "painters");
+    if (tab === "gear") return mapList(SQUEEGEES, "squeegees").concat(mapList(TRAILS, "trails"));
+    if (tab === "drip") {
+      return mapList(SHADES, "shades")
+        .concat(mapList(HATS, "hats"))
+        .concat(mapList(CHAINS, "chains"))
+        .concat(mapList(EMOTES, "emotes"));
     }
     return [];
   }
@@ -548,7 +621,11 @@ html, body {
       outfit: save.equipped.outfit || "classic",
       painter: save.equipped.painter || "ami",
       squeegee: save.equipped.squeegee || "classic",
-      trail: save.equipped.trail || "rainbow"
+      trail: save.equipped.trail || "rainbow",
+      shades: save.equipped.shades || "none",
+      hat: save.equipped.hat || "cap",
+      chain: save.equipped.chain || "none",
+      emote: save.equipped.emote || "wave"
     };
   }
 
@@ -561,89 +638,172 @@ html, body {
     if (row.type === "painters") look.painter = row.item.id;
     if (row.type === "squeegees") look.squeegee = row.item.id;
     if (row.type === "trails") look.trail = row.item.id;
+    if (row.type === "shades") { look.shades = row.item.id; look._strictShades = true; }
+    if (row.type === "hats") { look.hat = row.item.id; look._strictHat = true; }
+    if (row.type === "chains") { look.chain = row.item.id; look._strictChain = true; }
+    if (row.type === "emotes") look.emote = row.item.id;
     return look;
   }
 
-  function classifyPixel(r, g, b, a, isSwipe) {
-    if (a < 40) return "clear";
+  function hslOf(r, g, b) {
     const max = Math.max(r, g, b), min = Math.min(r, g, b);
     const lum = 0.3 * r + 0.59 * g + 0.11 * b;
     const sat = max === 0 ? 0 : (max - min) / max;
-    if (sat > 0.38 && max > 90) return "paint";
-    if (r > 95 && r > g + 8 && g > 42 && b < r * 0.88 && sat > 0.12 && lum > 55 && lum < 205) return "skin";
-    if (isSwipe && sat < 0.22 && lum > 75 && lum < 215) return "squeegee";
-    if (lum > 200 && sat < 0.22) return "white";
-    if (lum < 90) return "clothes";
+    let h = 0;
+    const d = max - min;
+    if (d > 0) {
+      if (max === r) h = ((g - b) / d) % 6;
+      else if (max === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h *= 60;
+      if (h < 0) h += 360;
+    }
+    return { h: h, sat: sat, lum: lum, max: max, min: min };
+  }
+
+  function isWarmSkin(r, g, b, hsl) {
+    return hsl.h >= 6 && hsl.h <= 52 && r > 58 && r > b + 12 && r >= g - 8 && hsl.sat > 0.14 && hsl.lum > 20 && hsl.lum < 220;
+  }
+
+  function partAt(relX, relY, pose) {
+    if (relY > -11) return "shoes";
+    const dx = relX - pose.eyeX;
+    if (relY < pose.capBot && relY >= pose.capTop - 6 && Math.abs(dx) < pose.headW + 8) return "cap";
+    if (relY >= pose.capBot && relY < pose.faceBot && Math.abs(dx) < pose.headW + 4) return "head";
+    if (relY >= pose.faceBot && relY < pose.shirtBot) return "shirt";
+    if (relY >= pose.shirtBot) return "pants";
     return "other";
   }
 
+  function colorOutfit(outfit, part, dark, relX, relY, pose, hat) {
+    const belly = (pose.faceBot + pose.shirtBot) / 2;
+    if (part === "cap") {
+      if (hat === "cap_red") return dark ? [140, 24, 28] : [200, 40, 46];
+      if (hat === "cap_blue") return dark ? [24, 48, 140] : [48, 96, 210];
+      if (outfit === "gold") return dark ? [154, 112, 24] : [230, 176, 48];
+      return null;
+    }
+    if (outfit === "classic" || !outfit) return null;
+    if (part !== "shirt" && part !== "pants") return null;
+    if (outfit === "hoodie") {
+      if (part === "pants") return null;
+      if (Math.abs(relY - (belly + 6)) < 5 && Math.abs(relX - pose.eyeX) < 12) return dark ? [90, 16, 22] : [130, 28, 36];
+      return dark ? [138, 24, 28] : [196, 40, 42];
+    }
+    if (outfit === "neon") {
+      if (part === "pants") {
+        if (Math.abs(relY - (pose.shirtBot + 8)) < 2) return [50, 255, 220];
+        return dark ? [40, 12, 50] : [70, 20, 80];
+      }
+      return dark ? [28, 14, 48] : [255, 47, 160];
+    }
+    if (outfit === "gold") return dark ? [154, 112, 24] : [230, 176, 48];
+    if (outfit === "overalls") {
+      const splat = (((relX | 0) * 73 + (relY | 0) * 37 + 13) % 17) === 0;
+      if (splat && part === "shirt") return hexToRgb(RAINBOW[Math.abs(((relX + relY) | 0)) % RAINBOW.length]);
+      return dark ? [36, 70, 110] : [58, 104, 150];
+    }
+    if (outfit === "rainbow") {
+      if (part !== "shirt") return null;
+      const hue = Math.abs((relY | 0) * 18) % 360;
+      return hslish(hue, 0.75, dark ? 0.28 : 0.52);
+    }
+    if (outfit === "varsity") {
+      if (part === "pants") return dark ? [24, 24, 32] : [36, 36, 48];
+      if (Math.abs(relY - (pose.faceBot + 16)) < 2) return [230, 192, 64];
+      if (Math.abs(relX - pose.eyeX) > 12) return dark ? [180, 150, 100] : [232, 208, 168];
+      return dark ? [90, 16, 28] : [154, 32, 48];
+    }
+    if (outfit === "smock") {
+      if (part === "pants") return null;
+      const splat = (((relX | 0) * 53 + (relY | 0) * 19 + 7) % 15) === 0;
+      if (splat) return hexToRgb(RAINBOW[Math.abs((relX * 3 + relY) | 0) % RAINBOW.length]);
+      return dark ? [150, 142, 128] : [228, 220, 200];
+    }
+    if (outfit === "summer") {
+      if (part === "pants") {
+        if (relY < -20) return dark ? [140, 100, 40] : [212, 168, 72];
+        return dark ? [140, 78, 42] : [196, 118, 72];
+      }
+      return dark ? [180, 180, 188] : [244, 244, 248];
+    }
+    return null;
+  }
+
   function tintImageData(img, frameName, look) {
-    const d = img.data, w = img.width, h = img.height;
+    const d = img.data;
     const swipe = frameName.indexOf("swipe") === 0;
+    const f = FRAMES[frameName] || { ax: 0, ay: 0 };
+    const pose = poseOf(frameName);
     const skin = {
       ami: null,
       drip: [196, 118, 72],
       critic: [214, 168, 132],
-      golden: [232, 196, 96]
+      golden: [232, 196, 96],
+      fresh: [220, 150, 108],
+      shadow: [78, 46, 30]
     }[look.painter] || null;
     for (let i = 0; i < d.length; i += 4) {
       const a = d[i + 3];
-      let r = d[i], g = d[i + 1], b = d[i + 2];
-      const x = (i / 4) % w, y = ((i / 4) / w) | 0;
-      const cls = classifyPixel(r, g, b, a, swipe);
-      if (cls === "clear" || cls === "other" || cls === "white") continue;
-      if (cls === "skin" && skin) {
-        const lum = (r + g + b) / (3 * 255);
-        d[i] = Math.min(255, skin[0] * (0.55 + lum * 0.7));
-        d[i + 1] = Math.min(255, skin[1] * (0.55 + lum * 0.7));
-        d[i + 2] = Math.min(255, skin[2] * (0.55 + lum * 0.7));
-        continue;
-      }
-      if (cls === "paint") {
-        const lum = Math.max(r, g, b) / 255;
+      if (a < 40) continue;
+      const r = d[i], g = d[i + 1], b = d[i + 2];
+      const x = (i / 4) % img.width, y = ((i / 4) / img.width) | 0;
+      const relX = x - f.ax, relY = y - f.ay;
+      const hsl = hslOf(r, g, b);
+      const part = partAt(relX, relY, pose);
+      const swipePaintZone = swipe && x > f.ax + 28;
+      const skinPx = !swipePaintZone && isWarmSkin(r, g, b, hsl);
+      const colorful = hsl.sat > 0.38 && hsl.max > 90;
+
+      if (colorful && !skinPx) {
+        const lum = hsl.max / 255;
         if (look.trail === "galaxy") {
           d[i] = Math.min(255, 90 + lum * 150); d[i + 1] = 40 + lum * 50; d[i + 2] = Math.min(255, 170 + lum * 85);
         } else if (look.trail === "money") {
           d[i] = 40 + lum * 70; d[i + 1] = Math.min(255, 150 + lum * 105); d[i + 2] = 30 + lum * 40;
         } else if (look.trail === "fire") {
           d[i] = Math.min(255, 190 + lum * 65); d[i + 1] = Math.min(255, 50 + lum * 140); d[i + 2] = 16;
+        } else if (look.trail === "hearts") {
+          d[i] = Math.min(255, 200 + lum * 55); d[i + 1] = 50 + lum * 90; d[i + 2] = Math.min(255, 120 + lum * 80);
+        } else if (look.trail === "lightning") {
+          d[i] = Math.min(255, 220 + lum * 35); d[i + 1] = Math.min(255, 210 + lum * 45); d[i + 2] = 40 + lum * 180;
         }
         continue;
       }
-      if (cls === "squeegee") {
-        const lum = Math.max(r, g, b) / 255;
+      if (skinPx && skin) {
+        const lum = (r + g + b) / (3 * 255);
+        d[i] = Math.min(255, skin[0] * (0.55 + lum * 0.7));
+        d[i + 1] = Math.min(255, skin[1] * (0.55 + lum * 0.7));
+        d[i + 2] = Math.min(255, skin[2] * (0.55 + lum * 0.7));
+        continue;
+      }
+      if (hsl.lum > 200 && hsl.sat < 0.22) continue;
+      if (swipe && hsl.sat < 0.22 && hsl.lum > 75 && hsl.lum < 215) {
+        const lum = hsl.max / 255;
         if (look.squeegee === "gold") {
           d[i] = Math.min(255, 200 + lum * 55); d[i + 1] = Math.min(255, 150 + lum * 70); d[i + 2] = 40 + lum * 40;
         } else if (look.squeegee === "neon") {
           d[i] = 30 + lum * 40; d[i + 1] = Math.min(255, 220 + lum * 35); d[i + 2] = Math.min(255, 210 + lum * 45);
         } else if (look.squeegee === "fire") {
           d[i] = Math.min(255, 230); d[i + 1] = 80 + lum * 120; d[i + 2] = 20;
+        } else if (look.squeegee === "ice") {
+          d[i] = 140 + lum * 80; d[i + 1] = Math.min(255, 210 + lum * 45); d[i + 2] = 255;
+        } else if (look.squeegee === "lightning") {
+          d[i] = 255; d[i + 1] = Math.min(255, 220 + lum * 35); d[i + 2] = 50 + lum * 80;
+        } else if (look.squeegee === "graffiti") {
+          const c = hslish(((x + y * 3) * 18) % 360, 0.85, 0.45 + lum * 0.2);
+          d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2];
+        } else if (look.squeegee === "diamond") {
+          const tw = ((x * 13 + y * 7) % 5) === 0;
+          d[i] = tw ? 255 : 190 + lum * 65; d[i + 1] = tw ? 255 : 230 + lum * 20; d[i + 2] = 255;
         }
         continue;
       }
-      if (cls === "clothes") {
+      if (hsl.lum < 96) {
+        if (part === "head") continue;
         const dark = (r + g + b) / 3 < 40;
-        let nr = r, ng = g, nb = b;
-        if (look.outfit === "hoodie") { nr = dark ? 138 : 196; ng = dark ? 24 : 40; nb = dark ? 28 : 42; }
-        else if (look.outfit === "neon") { nr = dark ? 28 : 255; ng = dark ? 14 : 47; nb = dark ? 48 : 160; }
-        else if (look.outfit === "gold") { nr = dark ? 154 : 230; ng = dark ? 112 : 176; nb = dark ? 24 : 48; }
-        else if (look.outfit === "overalls") { nr = dark ? 36 : 58; ng = dark ? 70 : 104; nb = dark ? 110 : 150; }
-        else if (look.outfit === "rainbow") {
-          const hue = ((x + y * 3) * 12) % 360;
-          const c = hslish(hue, 0.75, dark ? 0.28 : 0.5);
-          nr = c[0]; ng = c[1]; nb = c[2];
-        } else if (look.painter === "golden" && look.outfit === "classic") {
-          nr = dark ? 90 : 140; ng = dark ? 70 : 112; nb = dark ? 18 : 36;
-        }
-        if (look.outfit === "overalls") {
-          const splat = (x * 73 + y * 37 + 13) % 17;
-          if (splat === 0) {
-            const pc = RAINBOW[(x + y) % RAINBOW.length];
-            const parsed = hexToRgb(pc);
-            nr = parsed[0]; ng = parsed[1]; nb = parsed[2];
-          }
-        }
-        d[i] = nr; d[i + 1] = ng; d[i + 2] = nb;
+        const col = colorOutfit(look.outfit, part, dark, relX, relY, pose, look.hat);
+        if (col) { d[i] = col[0]; d[i + 1] = col[1]; d[i + 2] = col[2]; }
       }
     }
   }
@@ -667,7 +827,7 @@ html, body {
   }
 
   function getLookAtlas(look) {
-    const key = look.outfit + "|" + look.painter + "|" + look.squeegee + "|" + look.trail;
+    const key = (look.outfit || "classic") + "|" + (look.painter || "ami") + "|" + (look.squeegee || "classic") + "|" + (look.trail || "rainbow") + "|" + (look.hat || "cap");
     if (lookCache[key]) return lookCache[key];
     if (!atlas) return null;
     const cnv = document.createElement("canvas");
@@ -676,65 +836,163 @@ html, body {
     g.drawImage(atlas, 0, 0);
     const names = Object.keys(FRAMES);
     for (let i = 0; i < names.length; i++) {
-      const f = FRAMES[names[i]];
-      const img = g.getImageData(f.x, f.y, f.w, f.h);
+      const fr = FRAMES[names[i]];
+      const img = g.getImageData(fr.x, fr.y, fr.w, fr.h);
       tintImageData(img, names[i], look);
-      g.putImageData(img, f.x, f.y);
+      g.putImageData(img, fr.x, fr.y);
     }
     lookCache[key] = cnv;
     return cnv;
   }
 
   function painterAcc(id) {
-    for (let i = 0; i < PAINTERS.length; i++) if (PAINTERS[i].id === id) return PAINTERS[i].acc;
+    for (let i = 0; i < PAINTERS.length; i++) if (PAINTERS[i].id === id) return PAINTERS[i].acc || [];
     return [];
   }
 
-  function drawAccessories(facing, painter) {
-    const acc = painterAcc(painter);
-    ctx.save();
-    for (let i = 0; i < acc.length; i++) {
-      const a = acc[i];
-      if (a === "shades") {
-        ctx.fillStyle = "#111";
-        ctx.fillRect(-12, -80, 24, 7);
-        ctx.fillStyle = painter === "golden" ? "#e6c040" : "#3ae0e6";
-        ctx.fillRect(-10, -78, 8, 4);
-        ctx.fillRect(2, -78, 8, 4);
-      } else if (a === "chain") {
-        ctx.fillStyle = painter === "golden" ? "#f0d060" : "#e6d080";
-        ctx.fillRect(-8, -50, 16, 3);
-        ctx.fillRect(-3, -47, 6, 8);
-      } else if (a === "beanie") {
-        ctx.fillStyle = "#c4282a";
-        ctx.fillRect(-16, -116, 32, 14);
-        ctx.fillRect(-14, -122, 20, 8);
-        ctx.fillStyle = "#8a1c1e";
-        ctx.fillRect(-16, -104, 32, 4);
-      } else if (a === "bucket") {
-        ctx.fillStyle = "#3a2a18";
-        ctx.fillRect(-20, -108, 40, 8);
-        ctx.fillRect(-14, -118, 28, 12);
-        ctx.fillStyle = "#c8a84a";
-        ctx.fillRect(-20, -102, 40, 3);
-      }
+  function resolveAccessories(look) {
+    const a = Object.assign({}, look);
+    const acc = painterAcc(a.painter);
+    if (!a._strictShades && (!a.shades || a.shades === "none") && acc.indexOf("shades") >= 0) {
+      a.shades = a.painter === "golden" ? "gold" : "neon";
     }
+    if (!a._strictHat && (!a.hat || a.hat === "cap")) {
+      if (acc.indexOf("beanie") >= 0) a.hat = "beanie";
+      else if (acc.indexOf("bucket") >= 0) a.hat = "bucket";
+    }
+    if (!a._strictChain && (!a.chain || a.chain === "none") && acc.indexOf("chain") >= 0) {
+      a.chain = a.painter === "golden" ? "gold" : "silver";
+    }
+    return a;
+  }
+
+  function px(x, y, w, h) { ctx.fillRect(x | 0, y | 0, w, h); }
+
+  function drawShadesAt(ex, ey, style) {
+    ex |= 0; ey |= 0;
+    const pals = {
+      black: { rim: "#0d0d10", lens: "#1c2230", gloss: "#8eb0c8" },
+      neon: { rim: "#062028", lens: "#14e8e0", gloss: "#e8ffff" },
+      pink: { rim: "#401028", lens: "#ff4fa8", gloss: "#ffd8ee" },
+      heart: { rim: "#5a1028", lens: "#ff3b6a", gloss: "#ffd0e0" },
+      gold: { rim: "#6a5010", lens: "#e6c040", gloss: "#fff6c2" }
+    };
+    const pal = pals[style] || pals.black;
+    ctx.fillStyle = pal.rim;
+    px(ex - 15, ey - 1, 3, 2);
+    px(ex + 12, ey - 1, 3, 2);
+    px(ex - 12, ey - 5, 11, 10);
+    px(ex + 1, ey - 5, 11, 10);
+    px(ex - 1, ey - 2, 2, 3);
+    ctx.fillStyle = pal.lens;
+    px(ex - 10, ey - 3, 7, 6);
+    px(ex + 3, ey - 3, 7, 6);
+    if (style === "heart") {
+      px(ex - 10, ey - 6, 3, 2);
+      px(ex - 6, ey - 6, 3, 2);
+      px(ex + 3, ey - 6, 3, 2);
+      px(ex + 7, ey - 6, 3, 2);
+    }
+    ctx.fillStyle = pal.gloss;
+    px(ex - 9, ey - 2, 2, 2);
+    px(ex + 4, ey - 2, 2, 2);
+  }
+
+  function drawHatAt(ex, capTop, style) {
+    ex |= 0; capTop |= 0;
+    if (style === "beanie") {
+      ctx.fillStyle = "#c4282a";
+      px(ex - 15, capTop - 2, 30, 16);
+      px(ex - 8, capTop - 8, 12, 8);
+      ctx.fillStyle = "#f2f2f2";
+      px(ex + 2, capTop - 10, 4, 4);
+      ctx.fillStyle = "#8a1c1e";
+      px(ex - 15, capTop + 12, 30, 3);
+    } else if (style === "bucket") {
+      ctx.fillStyle = "#4a3420";
+      px(ex - 13, capTop, 26, 12);
+      px(ex - 20, capTop + 10, 40, 5);
+      ctx.fillStyle = "#d2b45a";
+      px(ex - 20, capTop + 14, 40, 2);
+    } else if (style === "crown") {
+      ctx.fillStyle = "#e6c040";
+      px(ex - 15, capTop + 4, 30, 8);
+      px(ex - 15, capTop - 4, 6, 10);
+      px(ex - 3, capTop - 8, 6, 14);
+      px(ex + 9, capTop - 4, 6, 10);
+      ctx.fillStyle = "#ff4fa3";
+      px(ex - 1, capTop - 4, 2, 2);
+      ctx.fillStyle = "#32b4ff";
+      px(ex - 13, capTop - 2, 2, 2);
+      px(ex + 11, capTop - 2, 2, 2);
+    }
+  }
+
+  function drawChainAt(ex, neckY, style) {
+    ex |= 0; neckY |= 0;
+    const gold = style === "gold";
+    ctx.fillStyle = gold ? "#f0d060" : "#d8d0c8";
+    px(ex - 9, neckY, 18, 3);
+    px(ex - 3, neckY + 3, 6, 8);
+    if (gold) {
+      ctx.fillStyle = "#ffe14a";
+      px(ex - 2, neckY + 6, 4, 4);
+    }
+  }
+
+  function drawOutfitExtras(look, name) {
+    const pose = poseOf(name);
+    const ex = pose.eyeX | 0;
+    if (look.outfit === "hoodie") {
+      const belly = ((pose.faceBot + pose.shirtBot) / 2 + 6) | 0;
+      ctx.fillStyle = "#6a1018";
+      px(ex - 11, belly, 22, 8);
+      ctx.fillStyle = "#3a080c";
+      px(ex - 1, belly, 2, 8);
+    } else if (look.outfit === "overalls") {
+      const h = Math.max(10, ((pose.shirtBot - pose.faceBot) * 0.55) | 0);
+      ctx.fillStyle = "#2a5478";
+      px(ex - 10, pose.faceBot - 2, 5, h);
+      px(ex + 5, pose.faceBot - 2, 5, h);
+      ctx.fillStyle = "#e6c040";
+      px(ex - 9, pose.faceBot + 8, 3, 3);
+      px(ex + 6, pose.faceBot + 8, 3, 3);
+    } else if (look.outfit === "varsity") {
+      ctx.fillStyle = "#e6c040";
+      px(ex - 12, pose.faceBot + 16, 24, 3);
+    }
+  }
+
+  function drawAccessories(facing, look, frameName) {
+    if (!look) return;
+    const resolved = resolveAccessories(look);
+    const pose = poseOf(frameName);
+    ctx.save();
+    if (resolved.shades && resolved.shades !== "none") drawShadesAt(pose.eyeX, pose.eyeY, resolved.shades);
+    if (resolved.hat && resolved.hat !== "cap" && resolved.hat !== "cap_red" && resolved.hat !== "cap_blue") {
+      drawHatAt(pose.eyeX, pose.capTop, resolved.hat);
+    }
+    if (resolved.chain && resolved.chain !== "none") drawChainAt(pose.eyeX, pose.faceBot + 4, resolved.chain);
     ctx.restore();
   }
 
-  function drawActor(sheet, name, x, y, facing, blink, painter) {
+  function drawActor(sheet, name, x, y, facing, blink, lookOrPainter) {
     const f = FRAMES[name];
     if (!f || !sheet) return;
     if (blink) return;
+    const look = !lookOrPainter ? null : (typeof lookOrPainter === "string" ? { painter: lookOrPainter } : lookOrPainter);
     ctx.save();
     ctx.translate(Math.round(x), Math.round(y));
     ctx.scale(facing < 0 ? -1 : 1, 1);
     ctx.drawImage(sheet, f.x, f.y, f.w, f.h, -f.ax, -f.ay, f.w, f.h);
-    if (painter) drawAccessories(facing, painter);
+    if (look) {
+      drawOutfitExtras(look, name);
+      drawAccessories(facing, look, name);
+    }
     ctx.restore();
   }
 
-  function cfg() { return LEVELS[currentLevel] || LEVELS[1]; }
+    function cfg() { return LEVELS[currentLevel] || LEVELS[1]; }
 
   function resetWorld() {
     const L = cfg();
@@ -878,13 +1136,16 @@ html, body {
     burst(best.x, best.y - best.h * 0.5, 22, trailColors(), 240);
   }
 
-  function trailColors() {
-    const t = save.equipped.trail;
+  function trailColorsFor(t) {
     if (t === "galaxy") return ["#7a3cff", "#32b4ff", "#ff4fd2", "#fff"];
     if (t === "money") return ["#3ee66a", "#b8ff4a", "#ffe14a", "#1a8a3a"];
     if (t === "fire") return ["#ff3b4a", "#ff8a1a", "#ffd21f", "#fff"];
+    if (t === "hearts") return ["#ff4fa3", "#ff8ad4", "#fff", "#ff3b6a"];
+    if (t === "confetti") return RAINBOW.concat(["#fff", "#ffe14a"]);
+    if (t === "lightning") return ["#ffe14a", "#fff", "#7ec8ff", "#fff6c2"];
     return RAINBOW;
   }
+  function trailColors() { return trailColorsFor(save.equipped.trail); }
 
   function easelInRange(e) {
     return !e.painted && Math.abs(player.x - e.x) < 70 && Math.abs(player.y - e.y) < 80;
@@ -901,6 +1162,15 @@ html, body {
     if (state.mode === "title" || state.mode === "shop" || state.mode === "locker") {
       state.titleT += dt;
       player.animT += dt;
+      if (tryIt.on) {
+        tryIt.t += dt;
+        if (tryIt.t > 2.8) tryIt.on = false;
+      }
+      for (let i = tryFx.length - 1; i >= 0; i--) {
+        const p = tryFx[i];
+        p.life -= dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 280 * dt;
+        if (p.life <= 0) tryFx.splice(i, 1);
+      }
       return;
     }
 
@@ -1064,7 +1334,11 @@ html, body {
   }
 
   function frameName() {
-    if (state.mode === "victory") return "victory";
+    if (state.mode === "victory") {
+      const em = (save.equipped && save.equipped.emote) || "wave";
+      if (em === "moonwalk" || em === "spin") return "walk" + (Math.floor(state.overT * 9) % 4);
+      return "victory";
+    }
     if (player.swiping) return "swipe" + Math.min(3, Math.floor((player.swipeT / SWIPE_TIME) * 4));
     if (!player.grounded) return "jump";
     if (Math.abs(player.vx) > 22) return "walk" + (Math.floor(player.animT * 9) % 4);
@@ -1081,12 +1355,24 @@ html, body {
     }
   }
 
+  function fillPixelCircle(cx, cy, r, color) {
+    ctx.fillStyle = color;
+    cx = Math.round(cx); cy = Math.round(cy); r = Math.max(1, Math.round(r));
+    for (let y = -r; y <= r; y++) {
+      const span = Math.sqrt(r * r - y * y) | 0;
+      ctx.fillRect(cx - span, cy + y, span * 2 + 1, 1);
+    }
+  }
+
   function drawSun(cx, cy, r, inner, outer) {
-    const g = ctx.createRadialGradient(cx, cy, 4, cx, cy, r);
-    g.addColorStop(0, inner);
-    g.addColorStop(1, outer);
-    ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+    fillPixelCircle(cx, cy, r + 30, "rgba(255,110,40,0.10)");
+    fillPixelCircle(cx, cy, r + 18, "rgba(255,140,50,0.16)");
+    fillPixelCircle(cx, cy, r + 8, "rgba(255,170,70,0.28)");
+    fillPixelCircle(cx, cy, r, "#ff9430");
+    fillPixelCircle(cx, cy, Math.round(r * 0.78), "#ffb347");
+    fillPixelCircle(cx, cy, Math.round(r * 0.56), "#ffd166");
+    fillPixelCircle(cx, cy, Math.round(r * 0.34), "#ffe994");
+    fillPixelCircle(cx, cy, Math.round(r * 0.16), "#fff6d0");
   }
 
   function drawBg() {
@@ -1292,7 +1578,8 @@ html, body {
     if (save.founderBadge) pixelText("FOUNDER", viewW / 2, 102, 8, "#e6c040");
 
     const sheet = getLookAtlas(equippedLook()) || atlas;
-    if (sheet) drawActor(sheet, "idle", viewW / 2, 230, 1, false, save.equipped.painter);
+    if (sheet) drawActor(sheet, "idle", viewW / 2, 230, 1, false, equippedLook());
+    pixelText("V4", 16, VIEW_H - 10, 7, "#8a7a9a", "left");
 
     pixelText("PAINT THE CITY. DODGE THE HATE.", viewW / 2, 258, 8, "#c8f4ff");
     const by = 278;
@@ -1361,24 +1648,92 @@ html, body {
 
   function itemBlurb(it) {
     return it.blurb || ({
-      classic: it.id === "classic" && it.name.indexOf("SQUEEGEE") >= 0 ? "The brush that started it." : (it.name.indexOf("BLACK") >= 0 || it.name === "CLASSIC BLACK" ? "The original painter look." : "The original tool."),
+      classic: it.name.indexOf("SQUEEGEE") >= 0 ? "The brush that started it." : (it.name.indexOf("BLACK") >= 0 || it.name === "CLASSIC BLACK" ? "The original painter look." : (it.name.indexOf("CAP") >= 0 ? "The cap he always wears." : "The original tool.")),
       overalls: "Work clothes with leftover paint.",
-      hoodie: "Eastside red, ready to paint.",
-      neon: it.name.indexOf("SQUEEGEE") >= 0 ? "Electric teal blade." : "Gallery-night glow.",
+      hoodie: "Eastside red, kangaroo pocket and all.",
+      neon: it.name.indexOf("SQUEEGEE") >= 0 ? "Electric teal blade." : (it.name.indexOf("SHADES") >= 0 ? "Glow visors for night sets." : "Gallery-night glow, fitted right."),
       rainbow: "Every color at once.",
-      gold: it.name.indexOf("SQUEEGEE") >= 0 ? "24-karat squeegee." : (it.name.indexOf("AMI") >= 0 ? "The founder-only gold Ami." : "Founder shine, head to toe."),
+      gold: it.name.indexOf("SQUEEGEE") >= 0 ? "24-karat squeegee." : (it.name.indexOf("SHADES") >= 0 ? "Founder lenses." : (it.name.indexOf("CHAIN") >= 0 ? "Heavy founder gold." : (it.name.indexOf("AMI") >= 0 ? "The founder-only gold Ami." : "Founder shine, head to toe."))),
       ami: "Painter. Not a talker.",
       drip: "Beanie, shades, and a chain.",
       critic: "Beat the gallery, or unlock with a pack.",
       golden: "The founder-only gold Ami.",
+      fresh: "A cleaner, brighter Ami.",
+      shadow: "Same painter. After midnight.",
       fire: it.name.indexOf("TRAIL") >= 0 ? "Hot streaks behind every swipe." : "A blade that looks lit.",
       galaxy: "Cosmic purple paint spray.",
-      money: "Cash-green drips."
+      money: "Cash-green drips.",
+      hearts: "Love on every canvas.",
+      confetti: "Pixel party behind every swipe.",
+      lightning: it.name.indexOf("TRAIL") >= 0 ? "Bolt streaks in the paint." : "A blade that cracks like thunder.",
+      ice: "Frosted steel, cold drips.",
+      graffiti: "Street-color blade.",
+      diamond: "Cuts light and canvas.",
+      smock: "Studio white with fresh splatters.",
+      summer: "White tee, khaki shorts, LA heat.",
+      varsity: "Letterman red with gold trim.",
+      none: it.name.indexOf("SHADES") >= 0 ? "Clear eyes, no extra drip." : "Keep it simple.",
+      black: "Classic dark frames.",
+      pink: "Hot-pink party lenses.",
+      heart: "Heart-shaped crush goggles.",
+      cap: "The original black cap.",
+      cap_red: "Same cap, game-day red.",
+      cap_blue: "Same cap, cool blue.",
+      beanie: "Red slouch beanie.",
+      bucket: "Gallery-night bucket hat.",
+      crown: "Founder-only pixel crown.",
+      silver: "A little extra drip.",
+      wave: "The classic arms-up win.",
+      spin: "Spin out after the last canvas.",
+      flex: "Hit the pose. Hold it.",
+      moonwalk: "Slide off stage backwards.",
+      goldpose: "Founder-only sparkle pose."
     })[it.id] || it.name;
   }
 
+  function startTryIt() {
+    tryIt.on = true;
+    tryIt.t = 0;
+    tryIt._lastSpawn = -1;
+    const cat = catalogFor(shopTab);
+    const row = cat[shopIndex];
+    tryIt.kind = row ? row.type : "";
+    tryFx.length = 0;
+    Chip.sfx("swipe");
+  }
+
+  function tryItFrame() {
+    if (!tryIt.on) return "idle";
+    if (tryIt.kind === "emotes") {
+      const em = (previewLook(shopTab, shopIndex).emote) || "wave";
+      if (em === "moonwalk" || em === "spin") return "walk" + (Math.floor(tryIt.t * 9) % 4);
+      return "victory";
+    }
+    const cycle = tryIt.t % 1.25;
+    if (cycle < SWIPE_TIME) return "swipe" + Math.min(3, Math.floor((cycle / SWIPE_TIME) * 4));
+    if (cycle < 0.85) return "idle";
+    return "walk" + (Math.floor((cycle - 0.85) * 10) % 4);
+  }
+
+  function pulseTryFx(cx, cy, look) {
+    const cols = trailColorsFor(look.trail);
+    const n = look.trail === "lightning" ? 7 : 5;
+    for (let i = 0; i < n; i++) {
+      tryFx.push({
+        x: cx + 24 + Math.random() * 46,
+        y: cy - 74 + Math.random() * 28,
+        vx: 50 + Math.random() * 90,
+        vy: -50 + Math.random() * 36,
+        life: 0.35 + Math.random() * 0.3,
+        max: 0.65,
+        color: cols[i % cols.length],
+        size: 2 + (Math.random() * 3 | 0)
+      });
+    }
+  }
+
   function drawShop() {
-    ctx.fillStyle = "rgba(10,8,18,0.9)"; ctx.fillRect(0, 0, viewW, VIEW_H);
+    ctx.fillStyle = "rgba(10,8,18,0.92)"; ctx.fillRect(0, 0, viewW, VIEW_H);
     pixelText("SHOP", 18, 20, 16, "#ffe14a", "left");
     pixelText(save.coins + " COINS", viewW - 18, 20, 10, "#ffe14a", "right");
     if (save.founderBadge) pixelText("FOUNDER", viewW - 18, 36, 8, "#e6c040", "right");
@@ -1386,64 +1741,100 @@ html, body {
     const wide = viewW >= 640;
     if (wide) {
       ctx.fillStyle = "#161022";
-      roundRect(18, 48, 300, 150, 10); ctx.fill();
+      roundRect(18, 40, 300, 128, 10); ctx.fill();
       ctx.strokeStyle = "#e6c040"; ctx.lineWidth = 3; ctx.stroke();
-      pixelText("FOUNDER PACK", 168, 66, 11, "#e6c040");
-      pixelText("$9.99", 168, 86, 16, "#ffe14a");
-      pixelText("Everything + Golden Ami", 168, 108, 8, "#fff");
-      pixelText("Gold squeegee + FOUNDER", 168, 124, 8, "#fff");
-      pixelText("+5000 coins   BEST VALUE", 168, 140, 8, "#7ee67a");
-      ui.buyF = btn(40, 150, 256, 36, save.packs.founder ? "OWNED" : "BUY FOUNDER", true);
+      pixelText("FOUNDER PACK", 148, 56, 11, "#e6c040");
+      pixelText("$9.99", 148, 76, 16, "#ffe14a");
+      pixelText("Everything + Golden Ami", 148, 96, 8, "#fff");
+      pixelText("Diamond + crown + 5000", 148, 110, 8, "#fff");
+      ui.buyF = btn(32, 124, 168, 32, save.packs.founder ? "OWNED" : "BUY FOUNDER", true, 9);
+
+      ctx.save();
+      roundRect(18, 40, 300, 128, 10); ctx.clip();
+      const pSheet = getLookAtlas({ outfit: "gold", painter: "golden", squeegee: "gold", trail: "rainbow", shades: "gold", hat: "crown", chain: "gold" }) || atlas;
+      if (pSheet) drawActor(pSheet, "idle", 268, 160, 1, false, { outfit: "gold", painter: "golden", squeegee: "gold", trail: "rainbow", shades: "gold", hat: "crown", chain: "gold" });
+      ctx.restore();
 
       ctx.fillStyle = "#161022";
-      roundRect(332, 48, 300, 150, 10); ctx.fill();
+      roundRect(332, 40, 300, 128, 10); ctx.fill();
       ctx.strokeStyle = "#ff8ad4"; ctx.lineWidth = 2; ctx.stroke();
-      pixelText("PAINTER PACK", 482, 66, 11, "#ff8ad4");
-      pixelText("$2.99", 482, 86, 16, "#fff");
-      pixelText("All painters + outfits", 482, 108, 8, "#fff");
-      pixelText("except founder exclusives", 482, 124, 8, "#c8b8d8");
-      ui.buyP = btn(354, 150, 256, 36, save.packs.painter || save.packs.founder ? "OWNED" : "BUY PAINTER", false);
+      pixelText("PAINTER PACK", 462, 56, 11, "#ff8ad4");
+      pixelText("$2.99", 462, 76, 16, "#fff");
+      pixelText("Painters + rainbow fit", 462, 96, 8, "#fff");
+      pixelText("except founder extras", 462, 110, 8, "#c8b8d8");
+      ui.buyP = btn(346, 124, 168, 32, save.packs.painter || save.packs.founder ? "OWNED" : "BUY PAINTER", false, 9);
 
-      const pSheet = getLookAtlas({ outfit: "gold", painter: "golden", squeegee: "gold", trail: "rainbow" }) || atlas;
-      if (pSheet) drawActor(pSheet, "idle", 286, 178, 1, false, "golden");
-      const rSheet = getLookAtlas({ outfit: "rainbow", painter: "drip", squeegee: "neon", trail: "galaxy" }) || atlas;
-      if (rSheet) drawActor(rSheet, "idle", 600, 178, -1, false, "drip");
+      ctx.save();
+      roundRect(332, 40, 300, 128, 10); ctx.clip();
+      const rSheet = getLookAtlas({ outfit: "rainbow", painter: "drip", squeegee: "neon", trail: "galaxy", shades: "neon", hat: "beanie", chain: "silver" }) || atlas;
+      if (rSheet) drawActor(rSheet, "idle", 582, 160, -1, false, { outfit: "rainbow", painter: "drip", squeegee: "neon", trail: "galaxy", shades: "neon", hat: "beanie", chain: "silver" });
+      ctx.restore();
     } else {
       ctx.fillStyle = "#161022";
-      roundRect(16, 42, viewW - 32, 78, 10); ctx.fill();
+      roundRect(16, 40, viewW - 32, 70, 10); ctx.fill();
       ctx.strokeStyle = "#e6c040"; ctx.lineWidth = 3; ctx.stroke();
-      pixelText("FOUNDER PACK  $9.99", viewW / 2, 58, 10, "#e6c040");
-      pixelText("Everything + Golden Ami + 5000 coins", viewW / 2, 74, 7, "#fff");
-      pixelText("BEST VALUE", viewW / 2, 88, 7, "#7ee67a");
-      ui.buyF = btn(viewW - 142, 86, 118, 26, save.packs.founder ? "OWNED" : "BUY", true);
+      pixelText("FOUNDER PACK  $9.99", viewW / 2 - 50, 56, 10, "#e6c040");
+      pixelText("Everything + 5000 coins", 28, 74, 7, "#fff", "left");
+      ui.buyF = btn(viewW - 142, 56, 118, 26, save.packs.founder ? "OWNED" : "BUY", true);
 
       ctx.fillStyle = "#161022";
-      roundRect(16, 128, viewW - 32, 64, 10); ctx.fill();
+      roundRect(16, 118, viewW - 32, 56, 10); ctx.fill();
       ctx.strokeStyle = "#ff8ad4"; ctx.lineWidth = 2; ctx.stroke();
-      pixelText("PAINTER PACK  $2.99", viewW / 2, 144, 10, "#ff8ad4");
-      pixelText("All painters + outfits", 28, 160, 7, "#c8b8d8", "left");
-      ui.buyP = btn(viewW - 142, 154, 118, 26, save.packs.painter || save.packs.founder ? "OWNED" : "BUY", false);
+      pixelText("PAINTER PACK  $2.99", viewW / 2 - 50, 134, 10, "#ff8ad4");
+      pixelText("Painters + rainbow fit", 28, 152, 7, "#c8b8d8", "left");
+      ui.buyP = btn(viewW - 142, 136, 118, 26, save.packs.painter || save.packs.founder ? "OWNED" : "BUY", false);
     }
 
-    pixelText("After you pay, Stripe shows a code.", viewW / 2, wide ? 214 : 204, 7, "#c8b8d8");
-    pixelText("Enter it in the box below.", viewW / 2, wide ? 228 : 216, 7, "#c8b8d8");
-    if (shopMsg) pixelText(shopMsg, viewW / 2, wide ? 244 : 230, 8, shopMsgOk ? "#7ee67a" : "#ff8ad4");
+    pixelText("After you pay, Stripe shows a code.", viewW / 2, wide ? 182 : 188, 7, "#c8b8d8");
+    pixelText("Enter it in the box below.", viewW / 2, wide ? 196 : 202, 7, "#c8b8d8");
+    if (shopMsg) pixelText(shopMsg, viewW / 2, wide ? 212 : 216, 8, shopMsgOk ? "#7ee67a" : "#ff8ad4");
 
     const look = previewLook(shopTab, shopIndex);
-    const prevX = 20, prevY = wide ? 258 : 244, prevW = wide ? 170 : 120, prevH = wide ? 140 : 110;
+    const prevX = 20, prevY = wide ? 226 : 228, prevW = wide ? 200 : 128, prevH = wide ? 152 : 118;
     ctx.fillStyle = "#120c1c";
     roundRect(prevX, prevY, prevW, prevH, 10); ctx.fill();
+    ctx.strokeStyle = "#3a2a50"; ctx.lineWidth = 2;
+    roundRect(prevX, prevY, prevW, prevH, 10); ctx.stroke();
+
+    ctx.save();
+    roundRect(prevX, prevY, prevW, prevH, 10); ctx.clip();
     const sheet = getLookAtlas(look) || atlas;
-    if (sheet) drawActor(sheet, "idle", prevX + prevW / 2, prevY + prevH - 8, 1, Math.floor(state.titleT * 8) % 16 === 0, look.painter);
+    let fr = "idle";
+    if (tryIt.on) fr = tryItFrame();
+    else if (Math.floor(state.titleT * 6) % 8 >= 5) fr = "walk" + (Math.floor(state.titleT * 8) % 4);
+    const feetX = prevX + prevW * (fr.indexOf("swipe") === 0 ? 0.38 : 0.50);
+    const feetY = prevY + prevH - 10;
+    if (sheet) {
+      ctx.save();
+      ctx.translate(feetX, feetY);
+      const sc = fr.indexOf("swipe") === 0 ? 0.70 : 0.82;
+      ctx.scale(sc, sc);
+      let face = 1;
+      if (tryIt.on && tryIt.kind === "emotes" && look.emote === "spin") face = (Math.floor(tryIt.t * 8) % 2) ? 1 : -1;
+      if (tryIt.on && tryIt.kind === "emotes" && look.emote === "moonwalk") face = -1;
+      drawActor(sheet, fr, 0, 0, face, false, look);
+      ctx.restore();
+    }
+    if (tryIt.on && fr.indexOf("swipe") === 0 && tryFx.length < 40) pulseTryFx(feetX, feetY, look);
+    for (let i = 0; i < tryFx.length; i++) {
+      const p = tryFx[i];
+      ctx.globalAlpha = Math.max(0, p.life / p.max);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x, p.y, p.size, p.size);
+      ctx.globalAlpha = 1;
+    }
+    ctx.restore();
     pixelText("PREVIEW", prevX + prevW / 2, prevY + 14, 7, "#ffe14a");
 
-    const tabs = ["fits", "faces", "gear"];
-    const tabL = viewW < 500 ? { fits: "FITS", faces: "FACES", gear: "GEAR" } : { fits: "OUTFITS", faces: "PAINTERS", gear: "GEAR" };
+    const tabs = ["fits", "faces", "gear", "drip"];
+    const tabL = viewW < 520
+      ? { fits: "FITS", faces: "FACES", gear: "GEAR", drip: "DRIP" }
+      : { fits: "OUTFITS", faces: "PAINTERS", gear: "GEAR", drip: "EXTRA" };
     const tabX = prevX + prevW + 12;
-    const tabW = Math.min(96, (viewW - tabX - 18) / 3 - 4);
+    const tabW = Math.min(92, (viewW - tabX - 16) / 4 - 4);
     for (let i = 0; i < tabs.length; i++) {
       const hot = shopTab === tabs[i];
-      ui["tab" + tabs[i]] = btn(tabX + i * (tabW + 6), prevY, tabW, 24, tabL[tabs[i]], hot, viewW < 500 ? 7 : 10);
+      ui["tab" + tabs[i]] = btn(tabX + i * (tabW + 5), prevY, tabW, 24, tabL[tabs[i]], hot, viewW < 520 ? 6 : 8);
     }
     const cat = catalogFor(shopTab);
     if (shopIndex >= cat.length) shopIndex = 0;
@@ -1452,13 +1843,13 @@ html, body {
       const it = row.item;
       const have = owns(row.type, it.id);
       const equipped = isEquipped(row.type, it.id);
-      pixelText(it.name.toUpperCase(), tabX + 4, prevY + 48, 9, "#fff", "left");
+      pixelText(it.name.toUpperCase(), tabX + 4, prevY + 46, 8, "#fff", "left");
       if (it.pack) {
-        ctx.fillStyle = "#e6c040";
-        roundRect(tabX + 4, prevY + 60, 48, 14, 4); ctx.fill();
-        pixelText("PACK", tabX + 28, prevY + 67, 7, "#111");
+        ctx.fillStyle = it.pack === "founder" ? "#e6c040" : "#ff8ad4";
+        roundRect(tabX + 4, prevY + 56, 48, 14, 4); ctx.fill();
+        pixelText("PACK", tabX + 28, prevY + 63, 7, "#111");
       }
-      pixelText(itemBlurb(it), tabX + 4, prevY + 86, 7, "#c8b8d8", "left");
+      pixelText(itemBlurb(it), tabX + 4, prevY + 84, 7, "#c8b8d8", "left");
       let price = "OWNED";
       if (!have) {
         if (it.pack === "founder" && !hasPack("founder")) price = it.price ? it.price + " OR FOUNDER" : "FOUNDER PACK";
@@ -1467,12 +1858,13 @@ html, body {
         else if (it.beat) price = "BEAT LEVEL " + it.beat;
         else price = "LOCKED";
       } else if (equipped) price = "EQUIPPED";
-      pixelText(price, tabX + 4, prevY + prevH - 28, 8, have ? "#7ee67a" : "#ffe14a", "left");
-      ui.prev = btn(tabX, prevY + prevH - 32, 40, 28, "<", false);
-      ui.nextI = btn(tabX + 46, prevY + prevH - 32, 40, 28, ">", false);
-      const buyX = tabX + 98;
-      const buyW = Math.max(72, viewW - 16 - buyX);
-      ui.buyItem = btn(buyX, prevY + prevH - 32, Math.min(120, buyW), 28, have ? (equipped ? "ON" : "EQUIP") : (it.price && (!it.pack || it.price > 0) ? "BUY" : "GET PACK"), have && !equipped, 9);
+      pixelText(price, tabX + 4, prevY + prevH - 50, 8, have ? "#7ee67a" : "#ffe14a", "left");
+      ui.prev = btn(tabX, prevY + prevH - 32, 36, 28, "<", false);
+      ui.nextI = btn(tabX + 40, prevY + prevH - 32, 36, 28, ">", false);
+      ui.tryIt = btn(tabX + 82, prevY + prevH - 32, 72, 28, tryIt.on ? "AGAIN" : "TRY IT", tryIt.on, 8);
+      const buyX = tabX + 160;
+      const buyW = Math.max(64, Math.min(120, viewW - 16 - buyX));
+      ui.buyItem = btn(buyX, prevY + prevH - 32, buyW, 28, have ? (equipped ? "ON" : "EQUIP") : (it.price && (!it.pack || it.price > 0) ? "BUY" : "GET PACK"), have && !equipped, 8);
     }
     ui.back = btn(16, VIEW_H - 40, 96, 28, "BACK", false);
     ui.goLocker = btn(122, VIEW_H - 40, 110, 28, "LOCKER", false);
@@ -1480,7 +1872,7 @@ html, body {
 
   function chipRow(label, list, type, y) {
     pixelText(label, 16, y, 7, "#ff8ad4", "left");
-    const cols = list.length > 4 && viewW < 620 ? 3 : list.length;
+    const cols = list.length > 4 && viewW < 700 ? 3 : Math.min(list.length, viewW < 520 ? 3 : list.length);
     const gap = 6;
     const bw = Math.floor((viewW - 32 - gap * (cols - 1)) / cols);
     const bh = 22;
@@ -1504,29 +1896,48 @@ html, body {
   }
 
   function drawLocker() {
-    ctx.fillStyle = "rgba(10,8,18,0.9)"; ctx.fillRect(0, 0, viewW, VIEW_H);
-    pixelText("LOCKER", viewW / 2, 22, 16, "#ffe14a");
-    pixelText("Tap a slot to wear it.", viewW / 2, 40, 7, "#c8b8d8");
+    ctx.fillStyle = "rgba(10,8,18,0.92)"; ctx.fillRect(0, 0, viewW, VIEW_H);
+    pixelText("LOCKER", viewW / 2, 20, 16, "#ffe14a");
+    pixelText("Tap a slot to wear it.", viewW / 2, 36, 7, "#c8b8d8");
     const look = equippedLook();
     ctx.fillStyle = "#120c1c";
-    roundRect(viewW / 2 - 80, 48, 160, 118, 12); ctx.fill();
+    roundRect(viewW / 2 - 80, 46, 160, 112, 12); ctx.fill();
     ctx.strokeStyle = "#ffe14a"; ctx.lineWidth = 2; ctx.stroke();
     const sheet = getLookAtlas(look) || atlas;
     if (sheet) {
       const walk = Math.floor(state.titleT * 8) % 4;
-      drawActor(sheet, Math.floor(state.titleT * 6) % 8 < 5 ? "idle" : "walk" + walk, viewW / 2, 156, 1, false, look.painter);
+      drawActor(sheet, Math.floor(state.titleT * 6) % 8 < 5 ? "idle" : "walk" + walk, viewW / 2, 148, 1, false, look);
     }
-    if (save.founderBadge) pixelText("FOUNDER", viewW / 2, 174, 8, "#e6c040");
-    let y = 184;
-    y = chipRow("OUTFIT", OUTFITS, "outfits", y);
-    y = chipRow("PAINTER", PAINTERS, "painters", y);
-    y = chipRow("SQUEEGEE", SQUEEGEES, "squeegees", y);
-    chipRow("TRAIL", TRAILS, "trails", y);
+    if (save.founderBadge) pixelText("FOUNDER", viewW / 2, 166, 8, "#e6c040");
+
+    const tabs = ["fits", "faces", "gear", "drip"];
+    const tabL = { fits: "FITS", faces: "FACES", gear: "GEAR", drip: "EXTRA" };
+    const tabW = Math.min(96, (viewW - 40) / 4 - 6);
+    const tabX0 = (viewW - (tabW * 4 + 18)) / 2;
+    for (let i = 0; i < tabs.length; i++) {
+      ui["ltab" + tabs[i]] = btn(tabX0 + i * (tabW + 6), 176, tabW, 24, tabL[tabs[i]], lockerTab === tabs[i], 7);
+    }
+
+    const cat = catalogFor(lockerTab);
+    const groups = [];
+    let lastType = "";
+    for (let i = 0; i < cat.length; i++) {
+      if (cat[i].type !== lastType) {
+        groups.push({ type: cat[i].type, list: [] });
+        lastType = cat[i].type;
+      }
+      groups[groups.length - 1].list.push(cat[i].item);
+    }
+    const labels = { outfits: "OUTFIT", painters: "PAINTER", squeegees: "SQUEEGEE", trails: "TRAIL", shades: "SHADES", hats: "HAT", chains: "CHAIN", emotes: "EMOTE" };
+    let y = 212;
+    for (let g = 0; g < groups.length; g++) {
+      y = chipRow(labels[groups[g].type] || groups[g].type.toUpperCase(), groups[g].list, groups[g].type, y);
+    }
     ui.back = btn(16, VIEW_H - 36, 96, 26, "BACK", false);
     ui.goShop = btn(122, VIEW_H - 36, 96, 26, "SHOP", false);
   }
 
-  function layoutBox() {
+    function layoutBox() {
     const scale = Math.min(W / viewW, H / VIEW_H);
     const dw = viewW * scale, dh = VIEW_H * scale;
     const dx = (W - dw) / 2;
@@ -1542,8 +1953,11 @@ html, body {
     ctx.imageSmoothingEnabled = false;
     const box = layoutBox();
     const scale = box.scale, dx = box.dx, dy = box.dy, dw = box.dw, dh = box.dh;
-    ctx.fillStyle = letterColor();
+    const lc = letterPair();
+    ctx.fillStyle = lc.top;
     ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = lc.bot;
+    ctx.fillRect(0, dy + dh, W, Math.max(0, H - (dy + dh)));
     ctx.beginPath(); ctx.rect(dx, dy, dw, dh); ctx.clip();
     ctx.translate(dx + ox * scale, dy + oy * scale);
     ctx.scale(scale, scale);
@@ -1558,8 +1972,16 @@ html, body {
 
     if (state.mode === "play" || state.mode === "intro" || state.mode === "victory") {
       const blink = player.invulnT > 0 && Math.floor(player.invulnT * 16) % 2 === 0;
-      const sheet = getLookAtlas(equippedLook()) || atlas;
-      drawActor(sheet, frameName(), player.x - camX, player.y, player.facing, blink, save.equipped.painter);
+      const look = equippedLook();
+      const sheet = getLookAtlas(look) || atlas;
+      let face = player.facing;
+      let px = player.x - camX;
+      if (state.mode === "victory") {
+        const em = look.emote || "wave";
+        if (em === "spin") face = (Math.floor(state.overT * 8) % 2) ? 1 : -1;
+        if (em === "moonwalk") { face = -1; px += Math.sin(state.overT * 5) * 18; }
+      }
+      drawActor(sheet, frameName(), px, player.y, face, blink, look);
     }
     for (let i = 0; i < particles.length; i++) {
       const p = particles[i];
@@ -1588,9 +2010,16 @@ html, body {
 
   function letterColor() {
     if (state.mode === "shop" || state.mode === "locker") return "#07010a";
-    if (currentLevel === 2) return "#ff8a4a";
+    if (currentLevel === 2) return "#3e1c62";
     if (currentLevel === 3) return "#12081c";
     return "#2eb0ee";
+  }
+
+  function letterPair() {
+    if (state.mode === "shop" || state.mode === "locker") return { top: "#07010a", bot: "#07010a" };
+    if (currentLevel === 2) return { top: "#3e1c62", bot: "#ff9c48" };
+    if (currentLevel === 3) return { top: "#12081c", bot: "#12081c" };
+    return { top: "#2eb0ee", bot: "#2eb0ee" };
   }
 
   const FRAMES = window.FRAMES || {};
@@ -1603,19 +2032,13 @@ html, body {
   let shopMsgOk = false;
 
   function isEquipped(type, id) {
-    const e = save.equipped;
-    if (type === "outfits") return e.outfit === id;
-    if (type === "painters") return e.painter === id;
-    if (type === "squeegees") return e.squeegee === id;
-    if (type === "trails") return e.trail === id;
-    return false;
+    const key = EQUIP_KEY[type];
+    return !!(key && save.equipped[key] === id);
   }
 
   function equip(type, id) {
-    if (type === "outfits") save.equipped.outfit = id;
-    else if (type === "painters") save.equipped.painter = id;
-    else if (type === "squeegees") save.equipped.squeegee = id;
-    else if (type === "trails") save.equipped.trail = id;
+    const key = EQUIP_KEY[type];
+    if (key) save.equipped[key] = id;
     writeSave();
     Chip.sfx("ui");
   }
@@ -1741,32 +2164,40 @@ html, body {
   function handleShop(p) {
     if (ui.buyF && hitBtn(ui.buyF, p.x, p.y) && !save.packs.founder) openLink(PACK_FOUNDER);
     if (ui.buyP && hitBtn(ui.buyP, p.x, p.y) && !save.packs.painter && !save.packs.founder) openLink(PACK_PAINTER);
-    if (ui.tabfits && hitBtn(ui.tabfits, p.x, p.y)) { shopTab = "fits"; shopIndex = 0; Chip.sfx("ui"); }
-    if (ui.tabfaces && hitBtn(ui.tabfaces, p.x, p.y)) { shopTab = "faces"; shopIndex = 0; Chip.sfx("ui"); }
-    if (ui.tabgear && hitBtn(ui.tabgear, p.x, p.y)) { shopTab = "gear"; shopIndex = 0; Chip.sfx("ui"); }
+    if (ui.tabfits && hitBtn(ui.tabfits, p.x, p.y)) { shopTab = "fits"; shopIndex = 0; tryIt.on = false; Chip.sfx("ui"); }
+    if (ui.tabfaces && hitBtn(ui.tabfaces, p.x, p.y)) { shopTab = "faces"; shopIndex = 0; tryIt.on = false; Chip.sfx("ui"); }
+    if (ui.tabgear && hitBtn(ui.tabgear, p.x, p.y)) { shopTab = "gear"; shopIndex = 0; tryIt.on = false; Chip.sfx("ui"); }
+    if (ui.tabdrip && hitBtn(ui.tabdrip, p.x, p.y)) { shopTab = "drip"; shopIndex = 0; tryIt.on = false; Chip.sfx("ui"); }
     const cat = catalogFor(shopTab);
     if (ui.prev && hitBtn(ui.prev, p.x, p.y) && cat.length) {
       shopIndex = (shopIndex - 1 + cat.length) % cat.length;
+      tryIt.on = false;
       Chip.sfx("ui");
     }
     if (ui.nextI && hitBtn(ui.nextI, p.x, p.y) && cat.length) {
       shopIndex = (shopIndex + 1) % cat.length;
+      tryIt.on = false;
       Chip.sfx("ui");
     }
+    if (ui.tryIt && hitBtn(ui.tryIt, p.x, p.y)) startTryIt();
     if (ui.buyItem && hitBtn(ui.buyItem, p.x, p.y) && cat[shopIndex]) {
       buyOrEquip(cat[shopIndex].type, cat[shopIndex].item.id);
     }
-    if (ui.back && hitBtn(ui.back, p.x, p.y)) { Chip.sfx("ui"); setMode("title"); }
-    if (ui.goLocker && hitBtn(ui.goLocker, p.x, p.y)) { Chip.sfx("ui"); setMode("locker"); }
+    if (ui.back && hitBtn(ui.back, p.x, p.y)) { tryIt.on = false; Chip.sfx("ui"); setMode("title"); }
+    if (ui.goLocker && hitBtn(ui.goLocker, p.x, p.y)) { tryIt.on = false; Chip.sfx("ui"); setMode("locker"); }
   }
 
   function handleLocker(p) {
+    if (ui.ltabfits && hitBtn(ui.ltabfits, p.x, p.y)) { lockerTab = "fits"; Chip.sfx("ui"); return; }
+    if (ui.ltabfaces && hitBtn(ui.ltabfaces, p.x, p.y)) { lockerTab = "faces"; Chip.sfx("ui"); return; }
+    if (ui.ltabgear && hitBtn(ui.ltabgear, p.x, p.y)) { lockerTab = "gear"; Chip.sfx("ui"); return; }
+    if (ui.ltabdrip && hitBtn(ui.ltabdrip, p.x, p.y)) { lockerTab = "drip"; Chip.sfx("ui"); return; }
     for (const k in ui) {
       if (k.indexOf("lk_") !== 0) continue;
       const b = ui[k];
       if (!hitBtn(b, p.x, p.y)) continue;
       if (b.have) equip(b.type, b.id);
-      else { Chip.sfx("ui"); setMode("shop"); }
+      else { Chip.sfx("ui"); setMode("shop"); shopTab = lockerTab; shopIndex = 0; }
       return;
     }
     if (ui.back && hitBtn(ui.back, p.x, p.y)) { Chip.sfx("ui"); setMode("title"); }
@@ -1969,6 +2400,7 @@ html, body {
         unlocked: save.unlocked,
         packs: { painter: save.packs.painter, founder: save.packs.founder },
         equipped: Object.assign({}, save.equipped),
+        version: GAME_VER,
         founderBadge: save.founderBadge,
         player: { x: player.x, y: player.y },
         easels: easels.slice(0, 8).map(function (e) { return { x: e.x, y: e.y, painted: e.painted }; }),
@@ -2031,8 +2463,13 @@ html, body {
     openLocker: function () { Chip.init(); setMode("locker"); },
     openTitle: function () { setMode("title"); },
     redeem: redeemCode,
-    setUnlocked: function (n) { save.unlocked = n; writeSave(); }
+    setUnlocked: function (n) { save.unlocked = n; writeSave(); },
+    setCoins: function (n) { save.coins = n; writeSave(); },
+    tryPreview: function () { startTryIt(); },
+    setShopTab: function (tab, index) { shopTab = tab || shopTab; shopIndex = index || 0; tryIt.on = false; tryFx.length = 0; },
+    version: GAME_VER
   };
+  window.__SQUEEGEE_VERSION = GAME_VER;
 
   Promise.resolve()
     .then(function () {
