@@ -7,7 +7,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#07010a">
-  <!-- squeegee-rush v6 -->
+  <!-- squeegee-rush v7 -->
   <title>SQUEEGEE RUSH — Ami Merchant Studios</title>
   <style>
 :root { --pad: env(safe-area-inset-bottom, 0px); }
@@ -114,6 +114,79 @@ html, body {
   cursor: pointer;
 }
 #codeGo:active { transform: translateY(1px); }
+#codeBar, #codeBar * { touch-action: manipulation; }
+#codeInput {
+  font-size: 16px;
+  user-select: text;
+  -webkit-user-select: text;
+  touch-action: manipulation;
+}
+#game { touch-action: none; }
+#linkOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(8,6,16,0.72);
+}
+#linkOverlay.show { display: flex; }
+#linkOverlay .linkCard {
+  width: min(360px, 100%);
+  background: #161022;
+  border: 3px solid #ffe14a;
+  border-radius: 14px;
+  padding: 22px 18px 18px;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+}
+#linkTitle {
+  color: #ffe14a;
+  font-size: 14px;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+#linkSub {
+  color: #c8b8d8;
+  font-size: 10px;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+#linkGo, #linkHere, #linkCancel {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 10px;
+  padding: 14px 12px;
+  border-radius: 10px;
+  font-family: PressStart, ui-monospace, monospace;
+  font-size: 11px;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+#linkGo {
+  background: #ffe14a;
+  color: #111;
+  border: 0;
+}
+#linkHere {
+  background: #1a1224;
+  color: #fff;
+  border: 2px solid #ffe14a;
+}
+#linkCancel {
+  background: transparent;
+  color: #c8b8d8;
+  border: 2px solid #5a4a6a;
+  margin-bottom: 0;
+}
+#linkGo:active, #linkHere:active, #linkCancel:active { transform: translateY(1px); }
 </style>
 </head>
 <body>
@@ -132,6 +205,15 @@ html, body {
     <div id="codeBar">
       <input id="codeInput" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ENTER CODE" aria-label="Enter pack code">
       <button id="codeGo" type="button">REDEEM</button>
+    </div>
+  </div>
+  <div id="linkOverlay" aria-hidden="true">
+    <div class="linkCard">
+      <div id="linkTitle">CHECKOUT</div>
+      <div id="linkSub"></div>
+      <a id="linkGo" href="#" target="_blank" rel="noopener noreferrer">CONTINUE TO CHECKOUT</a>
+      <button id="linkHere" type="button">OPEN IN THIS TAB</button>
+      <button id="linkCancel" type="button">NOT NOW</button>
     </div>
   </div>
   <script>
@@ -275,7 +357,7 @@ html, body {
     3: { id: 3, name: "GALLERY", tag: "OPENING NIGHT", time: 65, solid: true, style: "marble", can: 1.25, bub: 4.0, critic: true, gaps: false }
   };
 
-  const GAME_VER = "v6";
+  const GAME_VER = "v7";
 
   const OUTFITS = [
     { id: "classic", name: "CLASSIC BLACK", short: "CLASSIC", price: 0, pack: null },
@@ -479,6 +561,13 @@ html, body {
   let shopIndex = 0;
   let shopMsg = "";
   let shopMsgT = 0;
+  let shopMsgOk = false;
+  let shopFlash = 0;
+  let shopShake = 0;
+  let linkGuardUntil = 0;
+  let lastPointerAt = 0;
+  let lastPointerX = 0;
+  let lastPointerY = 0;
   let lockerTab = "fits";
   let lockerIndex = 0;
   let tryIt = { on: false, t: 0, kind: "", _lastSpawn: -1 };
@@ -1333,7 +1422,12 @@ html, body {
       if (flash > 0) flash = Math.max(0, flash - dt);
     }
     if (dailyToast > 0) dailyToast -= dt;
-    if (shopMsgT > 0) shopMsgT -= dt;
+    if (shopMsgT > 0) {
+      shopMsgT -= dt;
+      if (shopMsgT <= 0) { shopMsgT = 0; shopMsg = ""; }
+    }
+    if (shopFlash > 0) shopFlash = Math.max(0, shopFlash - dt);
+    if (shopShake > 0) shopShake = Math.max(0, shopShake - dt * 22);
 
     if (isFrozen()) return;
 
@@ -1798,9 +1892,8 @@ html, body {
       pixelText(locked ? "L" + i + " LOCK" : LEVELS[i].name, x + lw / 2, 398, 7, locked ? "#888" : (hot ? "#111" : "#fff"));
       ui["lv" + i] = { x: x, y: 382, w: lw, h: 32, n: i, locked: locked };
     }
-    pixelText((save.best[selectedLevel] || 0) > 0 ? "BEST " + save.best[selectedLevel] : "NEW HIGH SCORE AWAITS", viewW / 2, 426, 7, "#7ec8ee");
-    pixelText("BUY ORIGINAL PAINTINGS", viewW / 2, 442, 7, "#9ad0ff");
-    ui.art = { x: viewW / 2 - 130, y: 432, w: 260, h: 18 };
+    pixelText((save.best[selectedLevel] || 0) > 0 ? "BEST " + save.best[selectedLevel] : "NEW HIGH SCORE AWAITS", viewW / 2, 422, 7, "#7ec8ee");
+    ui.art = btn(Math.max(16, viewW / 2 - 150), 428, Math.min(300, viewW - 32), 20, "BUY ORIGINAL PAINTINGS", false, 7);
     if (dailyToast > 0) pixelText("+50 DAILY LOGIN COINS", viewW / 2, 22, 8, "#ffe14a");
     pixelText(save.coins + " COINS", viewW - 16, 18, 9, "#ffe14a", "right");
   }
@@ -2004,7 +2097,11 @@ html, body {
     if (shopMsg) pixelText(shopMsg, viewW / 2, packsBottom + 46, 8, shopMsgOk ? "#7ee67a" : "#ff8ad4");
 
     const look = previewLook(shopTab, shopIndex);
-    const prevX = 20, prevY = packsBottom + 56, prevW = wide ? 200 : 128, prevH = Math.max(110, Math.min(wide ? 148 : 118, VIEW_H - (packsBottom + 56) - 48));
+    const bottomBar = 48;
+    const prevX = 20;
+    const prevY = packsBottom + (wide ? 56 : 40);
+    const prevW = wide ? 200 : Math.min(128, Math.max(104, Math.floor(viewW * 0.34)));
+    const prevH = Math.max(110, Math.min(wide ? 148 : 168, VIEW_H - prevY - bottomBar));
 
     ctx.fillStyle = "#120c1c";
     roundRect(prevX, prevY, prevW, prevH, 10); ctx.fill();
@@ -2079,16 +2176,52 @@ html, body {
         else if (it.beat) price = "BEAT LEVEL " + it.beat;
         else price = "LOCKED";
       } else if (equipped) price = "EQUIPPED";
-      pixelText(price, tabX + 4, prevY + prevH - 50, 8, have ? "#7ee67a" : "#ffe14a", "left");
-      ui.prev = btn(tabX, prevY + prevH - 32, 36, 28, "<", false);
-      ui.nextI = btn(tabX + 40, prevY + prevH - 32, 36, 28, ">", false);
-      ui.tryIt = btn(tabX + 82, prevY + prevH - 32, 72, 28, tryIt.on ? "AGAIN" : "TRY IT", tryIt.on, 8);
-      const buyX = tabX + 160;
-      const buyW = Math.max(64, Math.min(120, viewW - 16 - buyX));
-      ui.buyItem = btn(buyX, prevY + prevH - 32, buyW, 28, have ? (equipped ? "ON" : "EQUIP") : (it.price && (!it.pack || it.price > 0) ? "BUY" : "GET PACK"), have && !equipped, 8);
+      const buyLabel = have ? (equipped ? "ON" : "EQUIP") : (it.price && (!it.pack || it.price > 0) ? "BUY" : "GET PACK");
+      const rowW = viewW - 16 - tabX;
+      const twoRow = rowW < 300;
+      const btnStack = twoRow ? 68 : 36;
+      pixelText(price, tabX + 4, prevY + prevH - btnStack - 14, 8, have ? "#7ee67a" : "#ffe14a", "left");
+      if (twoRow) {
+        const y1 = prevY + prevH - 64;
+        const y2 = prevY + prevH - 30;
+        ui.prev = btn(tabX, y1, 36, 28, "<", false);
+        ui.nextI = btn(tabX + 40, y1, 36, 28, ">", false);
+        ui.tryIt = btn(tabX + 82, y1, Math.max(72, Math.min(110, rowW - 82)), 28, tryIt.on ? "AGAIN" : "TRY IT", tryIt.on, 8);
+        ui.buyItem = btn(tabX, y2, rowW, 28, buyLabel, have && !equipped, 8);
+      } else {
+        ui.prev = btn(tabX, prevY + prevH - 32, 36, 28, "<", false);
+        ui.nextI = btn(tabX + 40, prevY + prevH - 32, 36, 28, ">", false);
+        ui.tryIt = btn(tabX + 82, prevY + prevH - 32, 72, 28, tryIt.on ? "AGAIN" : "TRY IT", tryIt.on, 8);
+        const buyX = tabX + 160;
+        const buyW = Math.max(64, Math.min(120, viewW - 16 - buyX));
+        ui.buyItem = btn(buyX, prevY + prevH - 32, buyW, 28, buyLabel, have && !equipped, 8);
+      }
     }
     ui.back = btn(16, VIEW_H - 40, 96, 28, "BACK", false);
     ui.goLocker = btn(122, VIEW_H - 40, 110, 28, "LOCKER", false);
+    drawShopToast();
+  }
+
+  function drawShopToast() {
+    if (!shopMsg || shopMsgT <= 0) return;
+    const ox = shopShake > 0 ? (Math.random() * 2 - 1) * 5 : 0;
+    const padX = 16;
+    const th = 34;
+    const tw = Math.min(viewW - padX * 2, Math.max(200, shopMsg.length * 8 + 28));
+    const tx = (viewW - tw) / 2 + ox;
+    const ty = 8;
+    ctx.fillStyle = shopMsgOk ? "rgba(16,40,22,0.94)" : "rgba(42,12,22,0.94)";
+    roundRect(tx, ty, tw, th, 8); ctx.fill();
+    ctx.strokeStyle = shopMsgOk ? "#7ee67a" : "#ff8ad4";
+    ctx.lineWidth = 2;
+    roundRect(tx, ty, tw, th, 8); ctx.stroke();
+    pixelText(shopMsg, viewW / 2 + ox, ty + th / 2 + 1, viewW < 500 ? 7 : 8, shopMsgOk ? "#7ee67a" : "#ffb0d0");
+    if (shopFlash > 0) {
+      ctx.fillStyle = shopMsgOk
+        ? "rgba(80,255,140," + (shopFlash * 0.22) + ")"
+        : "rgba(255,50,90," + (shopFlash * 0.2) + ")";
+      ctx.fillRect(0, 0, viewW, VIEW_H);
+    }
   }
 
   function chipRow(label, list, type, y) {
@@ -2260,7 +2393,6 @@ html, body {
   let ui = {};
   let hideChromeFlag = false;
   let codeDraft = "";
-  let shopMsgOk = false;
 
   function isEquipped(type, id) {
     const key = EQUIP_KEY[type];
@@ -2462,8 +2594,99 @@ html, body {
     }
   }
 
-  function openLink(url) {
-    window.open(url, "_blank", "noopener");
+  function flashShop(msg, ok) {
+    shopMsg = msg;
+    shopMsgOk = !!ok;
+    shopMsgT = 2.6;
+    shopFlash = ok ? 0.35 : 0.45;
+    shopShake = ok ? 0 : 12;
+  }
+
+  function hideLinkOverlay(force) {
+    const now = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+    if (!force && now < linkGuardUntil) return;
+    const ov = document.getElementById("linkOverlay");
+    if (ov) {
+      ov.classList.remove("show");
+      ov.setAttribute("aria-hidden", "true");
+    }
+  }
+
+  function bindLinkOverlay() {
+    const ov = document.getElementById("linkOverlay");
+    if (!ov || ov.dataset.bound === "1") return;
+    ov.dataset.bound = "1";
+    const go = document.getElementById("linkGo");
+    const here = document.getElementById("linkHere");
+    const cancel = document.getElementById("linkCancel");
+    if (go) {
+      go.addEventListener("click", function () { writeSave(); });
+    }
+    if (here) {
+      here.addEventListener("click", function (e) {
+        e.preventDefault();
+        const url = go && go.getAttribute("href");
+        writeSave();
+        hideLinkOverlay(true);
+        if (url && url !== "#") location.href = url;
+      });
+    }
+    if (cancel) {
+      cancel.addEventListener("click", function (e) {
+        e.preventDefault();
+        hideLinkOverlay();
+        Chip.sfx("ui");
+      });
+    }
+    ov.addEventListener("click", function (e) {
+      if (e.target === ov) hideLinkOverlay();
+    });
+  }
+
+  function ensureLinkOverlay() {
+    let ov = document.getElementById("linkOverlay");
+    if (ov) { bindLinkOverlay(); return ov; }
+    ov = document.createElement("div");
+    ov.id = "linkOverlay";
+    ov.setAttribute("aria-hidden", "true");
+    ov.innerHTML = '<div class="linkCard">' +
+      '<div id="linkTitle">CHECKOUT</div>' +
+      '<div id="linkSub"></div>' +
+      '<a id="linkGo" href="#" target="_blank" rel="noopener noreferrer">CONTINUE TO CHECKOUT</a>' +
+      '<button id="linkHere" type="button">OPEN IN THIS TAB</button>' +
+      '<button id="linkCancel" type="button">NOT NOW</button></div>';
+    document.body.appendChild(ov);
+    bindLinkOverlay();
+    return ov;
+  }
+
+  function offerCheckout(url, title, sub) {
+    writeSave();
+    Chip.sfx("ui");
+    const ov = ensureLinkOverlay();
+    const go = document.getElementById("linkGo");
+    const tEl = document.getElementById("linkTitle");
+    const sEl = document.getElementById("linkSub");
+    if (tEl) tEl.textContent = title || "CHECKOUT";
+    if (sEl) sEl.textContent = sub || "Opens Stripe checkout";
+    if (go) go.setAttribute("href", url);
+    if (ov) {
+      const reveal = function () {
+        ov.classList.add("show");
+        ov.setAttribute("aria-hidden", "false");
+        const now = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+        linkGuardUntil = now + 400;
+      };
+      setTimeout(reveal, 40);
+      return;
+    }
+    let win = null;
+    try { win = window.open(url, "_blank", "noopener"); } catch (err) { win = null; }
+    if (!win) location.href = url;
+  }
+
+  function openLink(url, title, sub) {
+    offerCheckout(url, title, sub);
   }
 
   function grantPainter() {
@@ -2508,34 +2731,33 @@ html, body {
     if (h === HASH_FOUNDER) {
       const already = save.packs.founder;
       grantFounder();
-      shopMsg = already ? "FOUNDER PACK ALREADY UNLOCKED" : "FOUNDER PACK UNLOCKED";
-      shopMsgOk = true;
+      flashShop(already ? "FOUNDER PACK ALREADY UNLOCKED" : "FOUNDER PACK UNLOCKED", true);
       Chip.sfx("win");
     } else if (h === HASH_HYPE) {
       const already = save.packs.hype || save.packs.founder;
       grantHype();
-      shopMsg = already ? "HYPE PACK ALREADY UNLOCKED" : "HYPE PACK UNLOCKED";
-      shopMsgOk = true;
+      flashShop(already ? "HYPE PACK ALREADY UNLOCKED" : "HYPE PACK UNLOCKED", true);
       Chip.sfx("combo");
     } else if (h === HASH_PAINTER) {
       const already = save.packs.painter || save.packs.founder;
       grantPainter();
-      shopMsg = already ? "PAINTER PACK ALREADY UNLOCKED" : "PAINTER PACK UNLOCKED";
-      shopMsgOk = true;
+      flashShop(already ? "PAINTER PACK ALREADY UNLOCKED" : "PAINTER PACK UNLOCKED", true);
       Chip.sfx("combo");
     } else {
-      shopMsg = "CODE NOT RECOGNIZED";
-      shopMsgOk = false;
+      flashShop("CODE NOT RECOGNIZED", false);
       Chip.sfx("hit");
     }
-    shopMsgT = 3.2;
+    if (shopMsgT < 3.2) shopMsgT = 3.2;
   }
 
   function buyOrEquip(type, id) {
     const item = findItem(type, id);
     if (!item) return;
     if (owns(type, id)) {
-      if (!isEquipped(type, id)) equip(type, id);
+      if (!isEquipped(type, id)) {
+        equip(type, id);
+        flashShop("EQUIPPED " + (item.short || item.name), true);
+      }
       return;
     }
     if (item.price > 0) {
@@ -2545,27 +2767,35 @@ html, body {
         if (save.owned[type].indexOf(id) < 0) save.owned[type].push(id);
         writeSave();
         equip(type, id);
-        shopMsg = "BOUGHT " + item.name;
-        shopMsgOk = true;
-        shopMsgT = 2.4;
+        flashShop("BOUGHT " + item.name, true);
         Chip.sfx("coin");
       } else {
-        shopMsg = "NEED " + item.price + " COINS";
-        shopMsgOk = false;
-        shopMsgT = 2.4;
+        flashShop("NEED " + item.price + " COINS", false);
         Chip.sfx("hit");
       }
       return;
     }
-    if (item.pack === "founder") openLink(PACK_FOUNDER);
-    else if (item.pack === "hype") openLink(PACK_HYPE);
-    else if (item.pack === "painter") openLink(PACK_PAINTER);
+    if (item.pack === "founder") offerCheckout(PACK_FOUNDER, "FOUNDER PACK", "$9.99  everything and 5000 coins");
+    else if (item.pack === "hype") offerCheckout(PACK_HYPE, "HYPE PACK", "$4.99  shades, trail, dance, 1500 coins");
+    else if (item.pack === "painter") offerCheckout(PACK_PAINTER, "PAINTER PACK", "$2.99  painters and rainbow");
   }
 
   function viewPos(e) {
     const r = canvas.getBoundingClientRect();
-    const cx = (e.clientX - r.left) * (canvas.width / Math.max(1, r.width));
-    const cy = (e.clientY - r.top) * (canvas.height / Math.max(1, r.height));
+    let clientX = e.clientX, clientY = e.clientY;
+    if ((clientX == null || clientY == null) && e.changedTouches && e.changedTouches[0]) {
+      clientX = e.changedTouches[0].clientX;
+      clientY = e.changedTouches[0].clientY;
+    }
+    W = canvas.width;
+    H = canvas.height;
+    if (H > 0) {
+      viewW = VIEW_H * (W / H);
+      if (viewW < 360) viewW = 360;
+      if (viewW > 980) viewW = 980;
+    }
+    const cx = (clientX - r.left) * (canvas.width / Math.max(1, r.width));
+    const cy = (clientY - r.top) * (canvas.height / Math.max(1, r.height));
     const box = layoutBox();
     return { x: (cx - box.dx) / box.scale, y: (cy - box.dy) / box.scale };
   }
@@ -2575,7 +2805,7 @@ html, body {
     if (ui.shop && hitBtn(ui.shop, p.x, p.y)) { Chip.init(); Chip.sfx("ui"); setMode("shop"); return; }
     if (ui.locker && hitBtn(ui.locker, p.x, p.y)) { Chip.init(); Chip.sfx("ui"); setMode("locker"); return; }
     if (ui.settings && hitBtn(ui.settings, p.x, p.y)) { Chip.init(); Chip.sfx("ui"); overlay = "settings"; overlayFrom = "title"; return; }
-    if (ui.art && hitBtn(ui.art, p.x, p.y)) { openLink(ART_LINK); return; }
+    if (ui.art && hitBtn(ui.art, p.x, p.y)) { offerCheckout(ART_LINK, "ORIGINAL PAINTINGS", "One of one canvases"); return; }
     for (let i = 1; i <= 3; i++) {
       const b = ui["lv" + i];
       if (b && hitBtn(b, p.x, p.y) && !b.locked) {
@@ -2587,29 +2817,41 @@ html, body {
   }
 
   function handleShop(p) {
-    if (ui.buyF && hitBtn(ui.buyF, p.x, p.y) && !save.packs.founder) openLink(PACK_FOUNDER);
-    if (ui.buyH && hitBtn(ui.buyH, p.x, p.y) && !save.packs.hype && !save.packs.founder) openLink(PACK_HYPE);
-    if (ui.buyP && hitBtn(ui.buyP, p.x, p.y) && !save.packs.painter && !save.packs.founder) openLink(PACK_PAINTER);
-    if (ui.tabfits && hitBtn(ui.tabfits, p.x, p.y)) { shopTab = "fits"; shopIndex = 0; tryIt.on = false; Chip.sfx("ui"); }
-    if (ui.tabfaces && hitBtn(ui.tabfaces, p.x, p.y)) { shopTab = "faces"; shopIndex = 0; tryIt.on = false; Chip.sfx("ui"); }
-    if (ui.tabgear && hitBtn(ui.tabgear, p.x, p.y)) { shopTab = "gear"; shopIndex = 0; tryIt.on = false; Chip.sfx("ui"); }
-    if (ui.tabdrip && hitBtn(ui.tabdrip, p.x, p.y)) { shopTab = "drip"; shopIndex = 0; tryIt.on = false; Chip.sfx("ui"); }
+    if (ui.buyF && hitBtn(ui.buyF, p.x, p.y)) {
+      if (!save.packs.founder) offerCheckout(PACK_FOUNDER, "FOUNDER PACK", "$9.99  everything and 5000 coins");
+      return;
+    }
+    if (ui.buyH && hitBtn(ui.buyH, p.x, p.y)) {
+      if (!save.packs.hype && !save.packs.founder) offerCheckout(PACK_HYPE, "HYPE PACK", "$4.99  shades, trail, dance, 1500 coins");
+      return;
+    }
+    if (ui.buyP && hitBtn(ui.buyP, p.x, p.y)) {
+      if (!save.packs.painter && !save.packs.founder) offerCheckout(PACK_PAINTER, "PAINTER PACK", "$2.99  painters and rainbow");
+      return;
+    }
+    if (ui.tabfits && hitBtn(ui.tabfits, p.x, p.y)) { shopTab = "fits"; shopIndex = 0; tryIt.on = false; Chip.sfx("ui"); return; }
+    if (ui.tabfaces && hitBtn(ui.tabfaces, p.x, p.y)) { shopTab = "faces"; shopIndex = 0; tryIt.on = false; Chip.sfx("ui"); return; }
+    if (ui.tabgear && hitBtn(ui.tabgear, p.x, p.y)) { shopTab = "gear"; shopIndex = 0; tryIt.on = false; Chip.sfx("ui"); return; }
+    if (ui.tabdrip && hitBtn(ui.tabdrip, p.x, p.y)) { shopTab = "drip"; shopIndex = 0; tryIt.on = false; Chip.sfx("ui"); return; }
     const cat = catalogFor(shopTab);
     if (ui.prev && hitBtn(ui.prev, p.x, p.y) && cat.length) {
       shopIndex = (shopIndex - 1 + cat.length) % cat.length;
       tryIt.on = false;
       Chip.sfx("ui");
+      return;
     }
     if (ui.nextI && hitBtn(ui.nextI, p.x, p.y) && cat.length) {
       shopIndex = (shopIndex + 1) % cat.length;
       tryIt.on = false;
       Chip.sfx("ui");
+      return;
     }
-    if (ui.tryIt && hitBtn(ui.tryIt, p.x, p.y)) startTryIt();
+    if (ui.tryIt && hitBtn(ui.tryIt, p.x, p.y)) { startTryIt(); return; }
     if (ui.buyItem && hitBtn(ui.buyItem, p.x, p.y) && cat[shopIndex]) {
       buyOrEquip(cat[shopIndex].type, cat[shopIndex].item.id);
+      return;
     }
-    if (ui.back && hitBtn(ui.back, p.x, p.y)) { tryIt.on = false; Chip.sfx("ui"); setMode("title"); }
+    if (ui.back && hitBtn(ui.back, p.x, p.y)) { tryIt.on = false; Chip.sfx("ui"); setMode("title"); return; }
     if (ui.goLocker && hitBtn(ui.goLocker, p.x, p.y)) { tryIt.on = false; Chip.sfx("ui"); setMode("locker"); }
   }
 
@@ -2631,9 +2873,9 @@ html, body {
   }
 
   function handleVictory(p) {
-    if (ui.packP && hitBtn(ui.packP, p.x, p.y)) openLink(PACK_PAINTER);
-    if (ui.packH && hitBtn(ui.packH, p.x, p.y)) openLink(PACK_HYPE);
-    if (ui.packF && hitBtn(ui.packF, p.x, p.y)) openLink(PACK_FOUNDER);
+    if (ui.packP && hitBtn(ui.packP, p.x, p.y)) { offerCheckout(PACK_PAINTER, "PAINTER PACK", "$2.99  painters and rainbow"); return; }
+    if (ui.packH && hitBtn(ui.packH, p.x, p.y)) { offerCheckout(PACK_HYPE, "HYPE PACK", "$4.99  shades, trail, dance, 1500 coins"); return; }
+    if (ui.packF && hitBtn(ui.packF, p.x, p.y)) { offerCheckout(PACK_FOUNDER, "FOUNDER PACK", "$9.99  everything and 5000 coins"); return; }
     if (ui.retry && hitBtn(ui.retry, p.x, p.y)) { startLevel(currentLevel); return; }
     if (ui.next && hitBtn(ui.next, p.x, p.y)) {
       if (currentLevel < 3 && save.unlocked >= currentLevel + 1) startLevel(currentLevel + 1);
@@ -2780,9 +3022,17 @@ html, body {
     if (k) input[k] = false;
   });
 
-  canvas.addEventListener("pointerdown", function (e) {
+  function handleCanvasPointer(e) {
+    if (e && e.button != null && e.button !== 0) return;
+    const ov = document.getElementById("linkOverlay");
+    if (ov && ov.classList.contains("show")) return;
     Chip.init();
     const p = viewPos(e);
+    const now = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+    if (now - lastPointerAt < 90 && Math.abs(p.x - lastPointerX) < 14 && Math.abs(p.y - lastPointerY) < 14) return;
+    lastPointerAt = now;
+    lastPointerX = p.x;
+    lastPointerY = p.y;
     if (overlay) { handleOverlay(p); return; }
     if (state.mode === "title") handleTitle(p);
     else if (state.mode === "shop") handleShop(p);
@@ -2792,6 +3042,15 @@ html, body {
       if (ui.pause && hitBtn(ui.pause, p.x, p.y)) { pauseGame(); return; }
       if (state.mode === "intro") introT = 0;
     }
+  }
+
+  canvas.style.touchAction = "none";
+  canvas.addEventListener("pointerdown", function (e) {
+    if (e.cancelable) e.preventDefault();
+    handleCanvasPointer(e);
+  }, { passive: false });
+  canvas.addEventListener("click", function (e) {
+    handleCanvasPointer(e);
   });
 
   document.addEventListener("touchmove", function (e) {
@@ -2919,7 +3178,25 @@ html, body {
     setCoins: function (n) { save.coins = n; writeSave(); },
     owns: owns,
     tryPreview: function () { startTryIt(); },
-    setShopTab: function (tab, index) { shopTab = tab || shopTab; shopIndex = index || 0; tryIt.on = false; tryFx.length = 0; },
+    setShopTab: function (tab, index) { shopTab = tab || shopTab; shopIndex = (index == null ? shopIndex : index); tryIt.on = false; tryFx.length = 0; },
+    getUI: function () {
+      const o = {};
+      for (const k in ui) {
+        const b = ui[k];
+        if (b && typeof b.x === "number") o[k] = { x: b.x, y: b.y, w: b.w, h: b.h, label: b.label };
+      }
+      return o;
+    },
+    viewToCSS: function (vx, vy) {
+      const r = canvas.getBoundingClientRect();
+      const box = layoutBox();
+      return {
+        x: r.left + (box.dx + vx * box.scale) * (r.width / Math.max(1, canvas.width)),
+        y: r.top + (box.dy + vy * box.scale) * (r.height / Math.max(1, canvas.height))
+      };
+    },
+    shopMessage: function () { return shopMsg; },
+    hideCheckout: function () { hideLinkOverlay(true); },
     pause: pauseGame,
     resume: resumeGame,
     openSettings: function (from) { overlay = "settings"; overlayFrom = from || "title"; },
@@ -2967,6 +3244,7 @@ html, body {
 
   resize();
   syncChrome();
+  bindLinkOverlay();
   requestAnimationFrame(loop);
 })();
 
