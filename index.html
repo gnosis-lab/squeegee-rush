@@ -7,7 +7,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#07010a">
-  <!-- squeegee-rush v4 -->
+  <!-- squeegee-rush v5 -->
   <title>SQUEEGEE RUSH — Ami Merchant Studios</title>
   <style>
 :root { --pad: env(safe-area-inset-bottom, 0px); }
@@ -262,9 +262,11 @@ html, body {
 
   const PACK_PAINTER = "https://buy.stripe.com/5kQ14pfwD2gE0pialIeME0c";
   const PACK_FOUNDER = "https://buy.stripe.com/dRmdRb98f5sQ5JC8dAeME0d";
+  const PACK_HYPE = "https://buy.stripe.com/6oU6oJfwDg7u1tm8dAeME0e";
   const ART_LINK = "https://buy.stripe.com/3cIfZj1FN9J65JCfG2eME0a";
   const HASH_PAINTER = "1f31ebaa";
   const HASH_FOUNDER = "43eef9f6";
+  const HASH_HYPE = "93e1dd32";
 
   const LEVELS = {
     1: { id: 1, name: "BACKYARD", tag: "PAINTER. NOT A TALKER.", time: 75, solid: true, style: "wood", can: 2.5, bub: 7.0, critic: false, gaps: false },
@@ -272,7 +274,7 @@ html, body {
     3: { id: 3, name: "GALLERY", tag: "OPENING NIGHT", time: 65, solid: true, style: "marble", can: 1.25, bub: 4.0, critic: true, gaps: false }
   };
 
-  const GAME_VER = "v4";
+  const GAME_VER = "v5";
 
   const OUTFITS = [
     { id: "classic", name: "CLASSIC BLACK", short: "CLASSIC", price: 0, pack: null },
@@ -310,7 +312,8 @@ html, body {
     { id: "money", name: "MONEY TRAIL", short: "MONEY", price: 350, pack: null },
     { id: "confetti", name: "PIXEL CONFETTI", short: "CONFETTI", price: 400, pack: null },
     { id: "fire", name: "FIRE TRAIL", short: "FIRE", price: 500, pack: null },
-    { id: "lightning", name: "LIGHTNING TRAIL", short: "BOLT", price: 650, pack: null }
+    { id: "lightning", name: "LIGHTNING TRAIL", short: "BOLT", price: 650, pack: null },
+    { id: "hype", name: "HYPE TRAIL", short: "HYPE", price: 0, pack: "hype" }
   ];
   const SHADES = [
     { id: "none", name: "NO SHADES", short: "NONE", price: 0, pack: null },
@@ -318,7 +321,8 @@ html, body {
     { id: "pink", name: "PINK SHADES", short: "PINK", price: 220, pack: null },
     { id: "neon", name: "NEON SHADES", short: "NEON", price: 250, pack: null },
     { id: "heart", name: "HEART SHADES", short: "HEART", price: 320, pack: null },
-    { id: "gold", name: "GOLD SHADES", short: "GOLD", price: 0, pack: "founder" }
+    { id: "gold", name: "GOLD SHADES", short: "GOLD", price: 0, pack: "founder" },
+    { id: "hype", name: "HYPE SHADES", short: "HYPE", price: 0, pack: "hype" }
   ];
   const HATS = [
     { id: "cap", name: "CLASSIC CAP", short: "CAP", price: 0, pack: null },
@@ -338,7 +342,8 @@ html, body {
     { id: "spin", name: "SPIN OUT", short: "SPIN", price: 200, pack: null },
     { id: "flex", name: "FLEX", short: "FLEX", price: 250, pack: null },
     { id: "moonwalk", name: "MOONWALK", short: "MOON", price: 400, pack: null },
-    { id: "goldpose", name: "FOUNDER POSE", short: "POSE", price: 0, pack: "founder" }
+    { id: "goldpose", name: "FOUNDER POSE", short: "POSE", price: 0, pack: "founder" },
+    { id: "hypedance", name: "HYPE DANCE", short: "HYPE", price: 0, pack: "hype" }
   ];
   const CATALOGS = {
     outfits: OUTFITS, painters: PAINTERS, squeegees: SQUEEGEES, trails: TRAILS,
@@ -385,7 +390,7 @@ html, body {
       coins: 0,
       owned: { outfits: ["classic"], painters: ["ami"], squeegees: ["classic"], trails: ["rainbow"], shades: ["none"], hats: ["cap"], chains: ["none"], emotes: ["wave"] },
       equipped: { outfit: "classic", painter: "ami", squeegee: "classic", trail: "rainbow", shades: "none", hat: "cap", chain: "none", emote: "wave" },
-      packs: { painter: false, founder: false },
+      packs: { painter: false, founder: false, hype: false },
       lastLogin: "",
       firstWin: { 1: false, 2: false, 3: false },
       founderBadge: false
@@ -580,6 +585,7 @@ html, body {
   function hasPack(kind) {
     if (save.packs.founder) return true;
     if (kind === "painter") return !!save.packs.painter;
+    if (kind === "hype") return !!save.packs.hype;
     if (kind === "founder") return !!save.packs.founder;
     return false;
   }
@@ -767,6 +773,8 @@ html, body {
           d[i] = Math.min(255, 200 + lum * 55); d[i + 1] = 50 + lum * 90; d[i + 2] = Math.min(255, 120 + lum * 80);
         } else if (look.trail === "lightning") {
           d[i] = Math.min(255, 220 + lum * 35); d[i + 1] = Math.min(255, 210 + lum * 45); d[i + 2] = 40 + lum * 180;
+        } else if (look.trail === "hype") {
+          d[i] = Math.min(255, 210 + lum * 45); d[i + 1] = Math.min(255, 50 + lum * 150); d[i + 2] = 12 + lum * 30;
         }
         continue;
       }
@@ -868,6 +876,16 @@ html, body {
 
   function px(x, y, w, h) { ctx.fillRect(x | 0, y | 0, w, h); }
 
+  function drawGlyphW(x, y, color, size) {
+    ctx.fillStyle = color;
+    const s = Math.max(1, size | 0);
+    px(x, y, s, s * 3);
+    px(x + s * 4, y, s, s * 3);
+    px(x + s * 2, y + s, s, s * 2);
+    px(x + s, y + s * 2, s, s);
+    px(x + s * 3, y + s * 2, s, s);
+  }
+
   function drawShadesAt(ex, ey, style) {
     ex |= 0; ey |= 0;
     const pals = {
@@ -887,6 +905,24 @@ html, body {
     ctx.fillStyle = pal.lens;
     px(ex - 10, ey - 3, 7, 6);
     px(ex + 3, ey - 3, 7, 6);
+    if (style === "hype") {
+      ctx.fillStyle = "#3a1408";
+      px(ex - 16, ey - 6, 32, 12);
+      px(ex - 17, ey - 1, 2, 4);
+      px(ex + 15, ey - 1, 2, 4);
+      ctx.fillStyle = "#ff4a10";
+      px(ex - 14, ey - 4, 28, 8);
+      ctx.fillStyle = "#ff8a1a";
+      px(ex - 14, ey - 4, 28, 4);
+      ctx.fillStyle = "#ffd21f";
+      px(ex - 13, ey - 3, 14, 2);
+      ctx.fillStyle = "#fff6c2";
+      px(ex - 11, ey - 3, 5, 2);
+      ctx.fillStyle = "#ff6a12";
+      px(ex - 15, ey - 7, 3, 2);
+      px(ex + 12, ey - 7, 3, 2);
+      return;
+    }
     if (style === "heart") {
       px(ex - 10, ey - 6, 3, 2);
       px(ex - 6, ey - 6, 3, 2);
@@ -1086,11 +1122,11 @@ html, body {
     writeSave();
   }
 
-  function burst(x, y, n, colors, speed) {
+  function burst(x, y, n, colors, speed, glyph) {
     for (let i = 0; i < n; i++) {
       const a = Math.random() * Math.PI * 2;
       const s = (0.3 + Math.random()) * (speed || 180);
-      particles.push({ x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 60, life: 0.35 + Math.random() * 0.45, max: 0.7, color: colors[i % colors.length], size: 2 + (Math.random() * 3 | 0) });
+      particles.push({ x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 60, life: 0.35 + Math.random() * 0.45, max: 0.7, color: colors[i % colors.length], size: 2 + (Math.random() * 3 | 0), glyph: (glyph && i % 3 === 0) ? glyph : null });
     }
   }
   function popup(x, y, text, color) {
@@ -1133,7 +1169,7 @@ html, body {
     popup(best.x, best.y - best.h - 18, "+" + pts, RAINBOW[(state.combo + 3) % RAINBOW.length]);
     popup(best.x, best.y - best.h - 38, "+5", "#ffe14a");
     if (state.combo > 2) popup(best.x, best.y - best.h - 56, "COMBO x" + (state.combo - 1), "#ffe14a");
-    burst(best.x, best.y - best.h * 0.5, 22, trailColors(), 240);
+    burst(best.x, best.y - best.h * 0.5, 22, trailColors(), 240, save.equipped.trail === "hype" ? "W" : null);
   }
 
   function trailColorsFor(t) {
@@ -1143,6 +1179,7 @@ html, body {
     if (t === "hearts") return ["#ff4fa3", "#ff8ad4", "#fff", "#ff3b6a"];
     if (t === "confetti") return RAINBOW.concat(["#fff", "#ffe14a"]);
     if (t === "lightning") return ["#ffe14a", "#fff", "#7ec8ff", "#fff6c2"];
+    if (t === "hype") return ["#ff3b1a", "#ff8a1a", "#ffd21f", "#fff", "#ff6a12"];
     return RAINBOW;
   }
   function trailColors() { return trailColorsFor(save.equipped.trail); }
@@ -1337,6 +1374,7 @@ html, body {
     if (state.mode === "victory") {
       const em = (save.equipped && save.equipped.emote) || "wave";
       if (em === "moonwalk" || em === "spin") return "walk" + (Math.floor(state.overT * 9) % 4);
+      if (em === "hypedance") return (Math.floor(state.overT * 8) % 2) ? "victory" : "walk" + (Math.floor(state.overT * 10) % 4);
       return "victory";
     }
     if (player.swiping) return "swipe" + Math.min(3, Math.floor((player.swipeT / SWIPE_TIME) * 4));
@@ -1576,10 +1614,11 @@ html, body {
     pixelText("PAINTER. NOT A TALKER.", viewW / 2, 70, 8, "#fff");
     pixelText("AMI MERCHANT STUDIOS", viewW / 2, 86, 7, "#ff8ad4");
     if (save.founderBadge) pixelText("FOUNDER", viewW / 2, 102, 8, "#e6c040");
+    else if (save.packs && save.packs.hype) pixelText("HYPE", viewW / 2, 102, 8, "#ff8a1a");
 
     const sheet = getLookAtlas(equippedLook()) || atlas;
     if (sheet) drawActor(sheet, "idle", viewW / 2, 230, 1, false, equippedLook());
-    pixelText("V4", 16, VIEW_H - 10, 7, "#8a7a9a", "left");
+    pixelText(GAME_VER.toUpperCase(), 16, VIEW_H - 10, 7, "#8a7a9a", "left");
 
     pixelText("PAINT THE CITY. DODGE THE HATE.", viewW / 2, 258, 8, "#c8f4ff");
     const by = 278;
@@ -1628,13 +1667,18 @@ html, body {
     pixelText("A pack keeps the paint flowing.", viewW / 2, 224, 8, "#c8b8d8");
     const wide = viewW >= 560;
     if (wide) {
-      ui.packP = btn(viewW / 2 - 220, 244, 200, 42, "PAINTER  $2.99", false);
-      ui.packF = btn(viewW / 2 + 20, 244, 200, 42, "FOUNDER  $9.99", true);
-      pixelText("Best value  ·  everything + 5000 coins", viewW / 2 + 120, 298, 7, "#e6c040");
+      const vw = Math.min(180, (viewW - 56) / 3);
+      const gap = 8;
+      const total = vw * 3 + gap * 2;
+      const x0 = (viewW - total) / 2;
+      ui.packP = btn(x0, 244, vw, 38, "PAINTER $2.99", false, 7);
+      ui.packH = btn(x0 + vw + gap, 244, vw, 38, "HYPE $4.99", false, 7);
+      ui.packF = btn(x0 + (vw + gap) * 2, 244, vw, 38, "FOUNDER $9.99", true, 7);
+      pixelText("BEST VALUE  ·  everything + 5000 coins", viewW / 2, 296, 7, "#e6c040");
     } else {
-      ui.packF = btn(24, 240, viewW - 48, 40, "FOUNDER PACK  $9.99", true);
-      pixelText("Best value  ·  everything + 5000 coins", viewW / 2, 290, 7, "#e6c040");
-      ui.packP = btn(24, 304, viewW - 48, 34, "PAINTER PACK  $2.99", false);
+      ui.packF = btn(24, 236, viewW - 48, 32, "FOUNDER  $9.99  BEST VALUE", true, 8);
+      ui.packH = btn(24, 274, viewW - 48, 28, "HYPE PACK  $4.99", false, 8);
+      ui.packP = btn(24, 308, viewW - 48, 26, "PAINTER PACK  $2.99", false, 8);
     }
     const by = wide ? 330 : 352;
     const bw = Math.min(140, (viewW - 48) / 3);
@@ -1687,7 +1731,9 @@ html, body {
       spin: "Spin out after the last canvas.",
       flex: "Hit the pose. Hold it.",
       moonwalk: "Slide off stage backwards.",
-      goldpose: "Founder-only sparkle pose."
+      goldpose: "Founder-only sparkle pose.",
+      hype: it.name.indexOf("SHADES") >= 0 ? "Flame visor. See the hype." : "Flame sparks and flying W's.",
+      hypedance: "Bounce, flip, and celebrate loud."
     })[it.id] || it.name;
   }
 
@@ -1707,6 +1753,7 @@ html, body {
     if (tryIt.kind === "emotes") {
       const em = (previewLook(shopTab, shopIndex).emote) || "wave";
       if (em === "moonwalk" || em === "spin") return "walk" + (Math.floor(tryIt.t * 9) % 4);
+      if (em === "hypedance") return (Math.floor(tryIt.t * 8) % 2) ? "victory" : "walk" + (Math.floor(tryIt.t * 10) % 4);
       return "victory";
     }
     const cycle = tryIt.t % 1.25;
@@ -1717,7 +1764,7 @@ html, body {
 
   function pulseTryFx(cx, cy, look) {
     const cols = trailColorsFor(look.trail);
-    const n = look.trail === "lightning" ? 7 : 5;
+    const n = (look.trail === "lightning" || look.trail === "hype") ? 8 : 5;
     for (let i = 0; i < n; i++) {
       tryFx.push({
         x: cx + 24 + Math.random() * 46,
@@ -1727,7 +1774,8 @@ html, body {
         life: 0.35 + Math.random() * 0.3,
         max: 0.65,
         color: cols[i % cols.length],
-        size: 2 + (Math.random() * 3 | 0)
+        size: 2 + (Math.random() * 3 | 0),
+        glyph: look.trail === "hype" && i % 3 === 0 ? "W" : null
       });
     }
   }
@@ -1738,59 +1786,66 @@ html, body {
     pixelText(save.coins + " COINS", viewW - 18, 20, 10, "#ffe14a", "right");
     if (save.founderBadge) pixelText("FOUNDER", viewW - 18, 36, 8, "#e6c040", "right");
 
-    const wide = viewW >= 640;
-    if (wide) {
-      ctx.fillStyle = "#161022";
-      roundRect(18, 40, 300, 128, 10); ctx.fill();
-      ctx.strokeStyle = "#e6c040"; ctx.lineWidth = 3; ctx.stroke();
-      pixelText("FOUNDER PACK", 148, 56, 11, "#e6c040");
-      pixelText("$9.99", 148, 76, 16, "#ffe14a");
-      pixelText("Everything + Golden Ami", 148, 96, 8, "#fff");
-      pixelText("Diamond + crown + 5000", 148, 110, 8, "#fff");
-      ui.buyF = btn(32, 124, 168, 32, save.packs.founder ? "OWNED" : "BUY FOUNDER", true, 9);
+    if (save.packs && save.packs.hype && !save.founderBadge) pixelText("HYPE", viewW - 18, 36, 8, "#ff8a1a", "right");
 
-      ctx.save();
-      roundRect(18, 40, 300, 128, 10); ctx.clip();
-      const pSheet = getLookAtlas({ outfit: "gold", painter: "golden", squeegee: "gold", trail: "rainbow", shades: "gold", hat: "crown", chain: "gold" }) || atlas;
-      if (pSheet) drawActor(pSheet, "idle", 268, 160, 1, false, { outfit: "gold", painter: "golden", squeegee: "gold", trail: "rainbow", shades: "gold", hat: "crown", chain: "gold" });
-      ctx.restore();
+    const wide = viewW >= 700;
+    const packY = 38;
+    const packGap = wide ? 10 : 6;
+    const packH = wide ? 122 : 86;
+    const packW = Math.floor((viewW - 36 - packGap * 2) / 3);
+    const packX0 = 18;
 
+    function drawPackCard(x, y, w, h, spec) {
       ctx.fillStyle = "#161022";
-      roundRect(332, 40, 300, 128, 10); ctx.fill();
-      ctx.strokeStyle = "#ff8ad4"; ctx.lineWidth = 2; ctx.stroke();
-      pixelText("PAINTER PACK", 462, 56, 11, "#ff8ad4");
-      pixelText("$2.99", 462, 76, 16, "#fff");
-      pixelText("Painters + rainbow fit", 462, 96, 8, "#fff");
-      pixelText("except founder extras", 462, 110, 8, "#c8b8d8");
-      ui.buyP = btn(346, 124, 168, 32, save.packs.painter || save.packs.founder ? "OWNED" : "BUY PAINTER", false, 9);
-
-      ctx.save();
-      roundRect(332, 40, 300, 128, 10); ctx.clip();
-      const rSheet = getLookAtlas({ outfit: "rainbow", painter: "drip", squeegee: "neon", trail: "galaxy", shades: "neon", hat: "beanie", chain: "silver" }) || atlas;
-      if (rSheet) drawActor(rSheet, "idle", 582, 160, -1, false, { outfit: "rainbow", painter: "drip", squeegee: "neon", trail: "galaxy", shades: "neon", hat: "beanie", chain: "silver" });
-      ctx.restore();
-    } else {
-      ctx.fillStyle = "#161022";
-      roundRect(16, 40, viewW - 32, 70, 10); ctx.fill();
-      ctx.strokeStyle = "#e6c040"; ctx.lineWidth = 3; ctx.stroke();
-      pixelText("FOUNDER PACK  $9.99", viewW / 2 - 50, 56, 10, "#e6c040");
-      pixelText("Everything + 5000 coins", 28, 74, 7, "#fff", "left");
-      ui.buyF = btn(viewW - 142, 56, 118, 26, save.packs.founder ? "OWNED" : "BUY", true);
-
-      ctx.fillStyle = "#161022";
-      roundRect(16, 118, viewW - 32, 56, 10); ctx.fill();
-      ctx.strokeStyle = "#ff8ad4"; ctx.lineWidth = 2; ctx.stroke();
-      pixelText("PAINTER PACK  $2.99", viewW / 2 - 50, 134, 10, "#ff8ad4");
-      pixelText("Painters + rainbow fit", 28, 152, 7, "#c8b8d8", "left");
-      ui.buyP = btn(viewW - 142, 136, 118, 26, save.packs.painter || save.packs.founder ? "OWNED" : "BUY", false);
+      roundRect(x, y, w, h, 10); ctx.fill();
+      ctx.strokeStyle = spec.stroke;
+      ctx.lineWidth = spec.best ? 3 : 2;
+      ctx.stroke();
+      pixelText(spec.title, x + 10, y + 16, wide ? 8 : 6, spec.stroke, "left");
+      pixelText(spec.price, x + 10, y + 36, wide ? 13 : 10, spec.priceColor, "left");
+      pixelText(spec.line1, x + 10, y + 52, 6, "#fff", "left");
+      pixelText(spec.line2, x + 10, y + 64, 6, "#c8b8d8", "left");
+      if (spec.badge) pixelText(spec.badge, x + 10, y + 78, 6, "#7ee67a", "left");
+      const bw = wide ? Math.min(122, w - 76) : Math.max(56, w - 14);
+      const b = btn(x + 8, y + h - 34, bw, 26, spec.owned ? "OWNED" : spec.buy, !!(spec.best && !spec.owned), wide ? 8 : 6);
+      if (wide && spec.look) {
+        ctx.save();
+        roundRect(x, y, w, h, 10); ctx.clip();
+        const sh = getLookAtlas(spec.look) || atlas;
+        if (sh) drawActor(sh, "idle", x + w - 38, y + h - 4, spec.face || 1, false, spec.look);
+        ctx.restore();
+      }
+      return b;
     }
 
-    pixelText("After you pay, Stripe shows a code.", viewW / 2, wide ? 182 : 188, 7, "#c8b8d8");
-    pixelText("Enter it in the box below.", viewW / 2, wide ? 196 : 202, 7, "#c8b8d8");
-    if (shopMsg) pixelText(shopMsg, viewW / 2, wide ? 212 : 216, 8, shopMsgOk ? "#7ee67a" : "#ff8ad4");
+    const painterLook = { outfit: "rainbow", painter: "drip", squeegee: "neon", trail: "galaxy", shades: "neon", hat: "beanie", chain: "silver" };
+    const hypeLook = { outfit: "hoodie", painter: "ami", squeegee: "fire", trail: "hype", shades: "hype", hat: "cap", chain: "none" };
+    const founderLook = { outfit: "gold", painter: "golden", squeegee: "gold", trail: "hype", shades: "gold", hat: "crown", chain: "gold" };
+
+    ui.buyP = drawPackCard(packX0, packY, packW, packH, {
+      title: "PAINTER PACK", price: "$2.99", line1: "Painters and rainbow", line2: "No founder extras",
+      stroke: "#ff8ad4", priceColor: "#fff", buy: "BUY",
+      owned: !!(save.packs.painter || save.packs.founder), look: painterLook, face: -1
+    });
+    ui.buyH = drawPackCard(packX0 + packW + packGap, packY, packW, packH, {
+      title: "HYPE PACK", price: "$4.99", line1: "Shades, trail, dance", line2: "Unlocks plus 1500",
+      stroke: "#ff8a1a", priceColor: "#ffd21f", buy: "BUY HYPE",
+      owned: !!(save.packs.hype || save.packs.founder), look: hypeLook
+    });
+    ui.buyF = drawPackCard(packX0 + (packW + packGap) * 2, packY, packW, packH, {
+      title: "FOUNDER PACK", price: "$9.99", line1: "Everything, gold Ami", line2: "Diamond, crown, 5000",
+      badge: "BEST VALUE", stroke: "#e6c040", priceColor: "#ffe14a", buy: "BUY FOUNDER",
+      owned: !!save.packs.founder, look: founderLook, best: true
+    });
+
+    const packsBottom = packY + packH;
+    pixelText("After you pay, Stripe shows a code.", viewW / 2, packsBottom + 16, 7, "#c8b8d8");
+    pixelText("Enter it in the box below.", viewW / 2, packsBottom + 30, 7, "#c8b8d8");
+    if (shopMsg) pixelText(shopMsg, viewW / 2, packsBottom + 46, 8, shopMsgOk ? "#7ee67a" : "#ff8ad4");
 
     const look = previewLook(shopTab, shopIndex);
-    const prevX = 20, prevY = wide ? 226 : 228, prevW = wide ? 200 : 128, prevH = wide ? 152 : 118;
+    const prevX = 20, prevY = packsBottom + 56, prevW = wide ? 200 : 128, prevH = Math.max(110, Math.min(wide ? 148 : 118, VIEW_H - (packsBottom + 56) - 48));
+
     ctx.fillStyle = "#120c1c";
     roundRect(prevX, prevY, prevW, prevH, 10); ctx.fill();
     ctx.strokeStyle = "#3a2a50"; ctx.lineWidth = 2;
@@ -1810,17 +1865,22 @@ html, body {
       const sc = fr.indexOf("swipe") === 0 ? 0.70 : 0.82;
       ctx.scale(sc, sc);
       let face = 1;
+      let dy = 0;
       if (tryIt.on && tryIt.kind === "emotes" && look.emote === "spin") face = (Math.floor(tryIt.t * 8) % 2) ? 1 : -1;
       if (tryIt.on && tryIt.kind === "emotes" && look.emote === "moonwalk") face = -1;
-      drawActor(sheet, fr, 0, 0, face, false, look);
+      if (tryIt.on && tryIt.kind === "emotes" && look.emote === "hypedance") {
+        face = (Math.floor(tryIt.t * 6) % 2) ? 1 : -1;
+        dy = -Math.abs(Math.sin(tryIt.t * 12)) * 14;
+      }
+      drawActor(sheet, fr, 0, dy, face, false, look);
       ctx.restore();
     }
     if (tryIt.on && fr.indexOf("swipe") === 0 && tryFx.length < 40) pulseTryFx(feetX, feetY, look);
     for (let i = 0; i < tryFx.length; i++) {
       const p = tryFx[i];
       ctx.globalAlpha = Math.max(0, p.life / p.max);
-      ctx.fillStyle = p.color;
-      ctx.fillRect(p.x, p.y, p.size, p.size);
+      if (p.glyph === "W") drawGlyphW(p.x, p.y, p.color, p.size);
+      else { ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, p.size, p.size); }
       ctx.globalAlpha = 1;
     }
     ctx.restore();
@@ -1845,7 +1905,7 @@ html, body {
       const equipped = isEquipped(row.type, it.id);
       pixelText(it.name.toUpperCase(), tabX + 4, prevY + 46, 8, "#fff", "left");
       if (it.pack) {
-        ctx.fillStyle = it.pack === "founder" ? "#e6c040" : "#ff8ad4";
+        ctx.fillStyle = it.pack === "founder" ? "#e6c040" : it.pack === "hype" ? "#ff8a1a" : "#ff8ad4";
         roundRect(tabX + 4, prevY + 56, 48, 14, 4); ctx.fill();
         pixelText("PACK", tabX + 28, prevY + 63, 7, "#111");
       }
@@ -1853,6 +1913,7 @@ html, body {
       let price = "OWNED";
       if (!have) {
         if (it.pack === "founder" && !hasPack("founder")) price = it.price ? it.price + " OR FOUNDER" : "FOUNDER PACK";
+        else if (it.pack === "hype" && !hasPack("hype")) price = "HYPE PACK";
         else if (it.pack === "painter" && !hasPack("painter") && !hasPack("founder")) price = it.price ? it.price + " OR PACK" : (it.beat ? "BEAT L" + it.beat + " OR PACK" : "PAINTER PACK");
         else if (it.price) price = it.price + " COINS";
         else if (it.beat) price = "BEAT LEVEL " + it.beat;
@@ -1976,18 +2037,24 @@ html, body {
       const sheet = getLookAtlas(look) || atlas;
       let face = player.facing;
       let px = player.x - camX;
+      let py = player.y;
       if (state.mode === "victory") {
         const em = look.emote || "wave";
         if (em === "spin") face = (Math.floor(state.overT * 8) % 2) ? 1 : -1;
         if (em === "moonwalk") { face = -1; px += Math.sin(state.overT * 5) * 18; }
+        if (em === "hypedance") {
+          face = (Math.floor(state.overT * 6) % 2) ? 1 : -1;
+          px += Math.sin(state.overT * 10) * 8;
+          py += -Math.abs(Math.sin(state.overT * 12)) * 16;
+        }
       }
-      drawActor(sheet, frameName(), px, player.y, face, blink, look);
+      drawActor(sheet, frameName(), px, py, face, blink, look);
     }
     for (let i = 0; i < particles.length; i++) {
       const p = particles[i];
       ctx.globalAlpha = Math.max(0, p.life / p.max);
-      ctx.fillStyle = p.color;
-      ctx.fillRect(p.x - camX, p.y, p.size, p.size);
+      if (p.glyph === "W") drawGlyphW(p.x - camX, p.y, p.color, p.size);
+      else { ctx.fillStyle = p.color; ctx.fillRect(p.x - camX, p.y, p.size, p.size); }
       ctx.globalAlpha = 1;
     }
     for (let i = 0; i < popups.length; i++) {
@@ -2073,16 +2140,31 @@ html, body {
     if (!save.packs.founder) {
       save.packs.founder = true;
       save.packs.painter = true;
+      save.packs.hype = true;
       save.founderBadge = true;
       save.coins += 5000;
     } else {
       save.packs.founder = true;
       save.packs.painter = true;
+      save.packs.hype = true;
       save.founderBadge = true;
     }
     save.equipped.painter = "golden";
     save.equipped.outfit = "gold";
     save.equipped.squeegee = "gold";
+    writeSave();
+  }
+
+  function grantHype() {
+    if (!save.packs.hype && !save.packs.founder) {
+      save.packs.hype = true;
+      save.coins += 1500;
+      save.equipped.shades = "hype";
+      save.equipped.trail = "hype";
+      save.equipped.emote = "hypedance";
+    } else {
+      save.packs.hype = true;
+    }
     writeSave();
   }
 
@@ -2094,6 +2176,12 @@ html, body {
       shopMsg = already ? "FOUNDER PACK ALREADY UNLOCKED" : "FOUNDER PACK UNLOCKED";
       shopMsgOk = true;
       Chip.sfx("win");
+    } else if (h === HASH_HYPE) {
+      const already = save.packs.hype || save.packs.founder;
+      grantHype();
+      shopMsg = already ? "HYPE PACK ALREADY UNLOCKED" : "HYPE PACK UNLOCKED";
+      shopMsgOk = true;
+      Chip.sfx("combo");
     } else if (h === HASH_PAINTER) {
       const already = save.packs.painter || save.packs.founder;
       grantPainter();
@@ -2135,6 +2223,7 @@ html, body {
       return;
     }
     if (item.pack === "founder") openLink(PACK_FOUNDER);
+    else if (item.pack === "hype") openLink(PACK_HYPE);
     else if (item.pack === "painter") openLink(PACK_PAINTER);
   }
 
@@ -2163,6 +2252,7 @@ html, body {
 
   function handleShop(p) {
     if (ui.buyF && hitBtn(ui.buyF, p.x, p.y) && !save.packs.founder) openLink(PACK_FOUNDER);
+    if (ui.buyH && hitBtn(ui.buyH, p.x, p.y) && !save.packs.hype && !save.packs.founder) openLink(PACK_HYPE);
     if (ui.buyP && hitBtn(ui.buyP, p.x, p.y) && !save.packs.painter && !save.packs.founder) openLink(PACK_PAINTER);
     if (ui.tabfits && hitBtn(ui.tabfits, p.x, p.y)) { shopTab = "fits"; shopIndex = 0; tryIt.on = false; Chip.sfx("ui"); }
     if (ui.tabfaces && hitBtn(ui.tabfaces, p.x, p.y)) { shopTab = "faces"; shopIndex = 0; tryIt.on = false; Chip.sfx("ui"); }
@@ -2206,6 +2296,7 @@ html, body {
 
   function handleVictory(p) {
     if (ui.packP && hitBtn(ui.packP, p.x, p.y)) openLink(PACK_PAINTER);
+    if (ui.packH && hitBtn(ui.packH, p.x, p.y)) openLink(PACK_HYPE);
     if (ui.packF && hitBtn(ui.packF, p.x, p.y)) openLink(PACK_FOUNDER);
     if (ui.retry && hitBtn(ui.retry, p.x, p.y)) { startLevel(currentLevel); return; }
     if (ui.next && hitBtn(ui.next, p.x, p.y)) {
@@ -2398,7 +2489,7 @@ html, body {
         level: currentLevel,
         coins: save.coins,
         unlocked: save.unlocked,
-        packs: { painter: save.packs.painter, founder: save.packs.founder },
+        packs: { painter: save.packs.painter, founder: save.packs.founder, hype: save.packs.hype },
         equipped: Object.assign({}, save.equipped),
         version: GAME_VER,
         founderBadge: save.founderBadge,
@@ -2465,6 +2556,7 @@ html, body {
     redeem: redeemCode,
     setUnlocked: function (n) { save.unlocked = n; writeSave(); },
     setCoins: function (n) { save.coins = n; writeSave(); },
+    owns: owns,
     tryPreview: function () { startTryIt(); },
     setShopTab: function (tab, index) { shopTab = tab || shopTab; shopIndex = index || 0; tryIt.on = false; tryFx.length = 0; },
     version: GAME_VER
