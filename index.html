@@ -7,7 +7,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#07010a">
-  <!-- squeegee-rush v7 -->
+  <!-- squeegee-rush v8 -->
   <title>SQUEEGEE RUSH — Ami Merchant Studios</title>
   <style>
 :root { --pad: env(safe-area-inset-bottom, 0px); }
@@ -357,7 +357,7 @@ html, body {
     3: { id: 3, name: "GALLERY", tag: "OPENING NIGHT", time: 65, solid: true, style: "marble", can: 1.25, bub: 4.0, critic: true, gaps: false }
   };
 
-  const GAME_VER = "v7";
+  const GAME_VER = "v8";
 
   const OUTFITS = [
     { id: "classic", name: "CLASSIC BLACK", short: "CLASSIC", price: 0, pack: null },
@@ -549,6 +549,7 @@ html, body {
   const pressed = { jump: false, swipe: false };
 
   let viewW = 800;
+  let viewH = VIEW_H;
   let atlas = null;
   let layers = {};
   let ready = false;
@@ -1847,6 +1848,55 @@ html, body {
     ctx.fillText(text, x, y);
   }
 
+  function measureTextW(text, size) {
+    ctx.font = size + "px '" + FONT + "', monospace";
+    return ctx.measureText(String(text || "")).width;
+  }
+
+  function fitText(text, size, maxW) {
+    text = String(text || "");
+    if (maxW <= 0) return "";
+    if (measureTextW(text, size) <= maxW) return text;
+    const ell = "...";
+    if (measureTextW(ell, size) > maxW) return "";
+    let lo = 0, hi = text.length;
+    while (lo < hi) {
+      const mid = Math.ceil((lo + hi) / 2);
+      if (measureTextW(text.slice(0, mid) + ell, size) <= maxW) lo = mid;
+      else hi = mid - 1;
+    }
+    return lo > 0 ? text.slice(0, lo) + ell : ell;
+  }
+
+  function wrapText(text, size, maxW, maxLines) {
+    const words = String(text || "").split(/\s+/).filter(Boolean);
+    const lines = [];
+    let cur = "";
+    maxLines = Math.max(1, maxLines || 1);
+    for (let i = 0; i < words.length; i++) {
+      const w = words[i];
+      const trial = cur ? cur + " " + w : w;
+      if (measureTextW(trial, size) <= maxW) {
+        cur = trial;
+        continue;
+      }
+      if (lines.length + 1 >= maxLines) {
+        lines.push(fitText((cur ? cur + " " : "") + words.slice(i).join(" "), size, maxW));
+        return lines;
+      }
+      if (cur) lines.push(cur);
+      if (measureTextW(w, size) <= maxW) {
+        cur = w;
+      } else {
+        lines.push(fitText(w, size, maxW));
+        cur = "";
+        if (lines.length >= maxLines) return lines;
+      }
+    }
+    if (cur && lines.length < maxLines) lines.push(cur);
+    return lines;
+  }
+
   function btn(x, y, w, h, label, hot, size) {
     ctx.fillStyle = hot ? "#ffe14a" : "#1a1224";
     roundRect(x, y, w, h, 8); ctx.fill();
@@ -2034,34 +2084,34 @@ html, body {
   }
 
   function drawShop() {
-    ctx.fillStyle = "rgba(10,8,18,0.92)"; ctx.fillRect(0, 0, viewW, VIEW_H);
-    pixelText("SHOP", 18, 20, 16, "#ffe14a", "left");
-    pixelText(save.coins + " COINS", viewW - 18, 20, 10, "#ffe14a", "right");
-    if (save.founderBadge) pixelText("FOUNDER", viewW - 18, 36, 8, "#e6c040", "right");
-
-    if (save.packs && save.packs.hype && !save.founderBadge) pixelText("HYPE", viewW - 18, 36, 8, "#ff8a1a", "right");
-
+    ctx.fillStyle = "rgba(10,8,18,0.92)"; ctx.fillRect(0, 0, viewW, viewH);
     const wide = viewW >= 700;
-    const packY = 38;
-    const packGap = wide ? 10 : 6;
-    const packH = wide ? 122 : 86;
-    const packW = Math.floor((viewW - 36 - packGap * 2) / 3);
-    const packX0 = 18;
+    if (wide) {
+      pixelText("SHOP", 18, 20, 16, "#ffe14a", "left");
+      pixelText(save.coins + " COINS", viewW - 18, 20, 10, "#ffe14a", "right");
+      if (save.founderBadge) pixelText("FOUNDER", viewW - 18, 36, 8, "#e6c040", "right");
+      else if (save.packs && save.packs.hype) pixelText("HYPE", viewW - 18, 36, 8, "#ff8a1a", "right");
+    } else {
+      pixelText("SHOP", 16, 18, 14, "#ffe14a", "left");
+      pixelText(save.coins + " COINS", viewW - 14, 18, 9, "#ffe14a", "right");
+      if (save.founderBadge) pixelText("FOUNDER", viewW / 2, 18, 8, "#e6c040");
+      else if (save.packs && save.packs.hype) pixelText("HYPE", viewW / 2, 18, 8, "#ff8a1a");
+    }
 
-    function drawPackCard(x, y, w, h, spec) {
+    function drawPackCardWide(x, y, w, h, spec) {
       ctx.fillStyle = "#161022";
       roundRect(x, y, w, h, 10); ctx.fill();
       ctx.strokeStyle = spec.stroke;
       ctx.lineWidth = spec.best ? 3 : 2;
       ctx.stroke();
-      pixelText(spec.title, x + 10, y + 16, wide ? 8 : 6, spec.stroke, "left");
-      pixelText(spec.price, x + 10, y + 36, wide ? 13 : 10, spec.priceColor, "left");
+      pixelText(spec.title, x + 10, y + 16, 8, spec.stroke, "left");
+      pixelText(spec.price, x + 10, y + 36, 13, spec.priceColor, "left");
       pixelText(spec.line1, x + 10, y + 52, 6, "#fff", "left");
       pixelText(spec.line2, x + 10, y + 64, 6, "#c8b8d8", "left");
       if (spec.badge) pixelText(spec.badge, x + 10, y + 78, 6, "#7ee67a", "left");
-      const bw = wide ? Math.min(122, w - 76) : Math.max(56, w - 14);
-      const b = btn(x + 8, y + h - 34, bw, 26, spec.owned ? "OWNED" : spec.buy, !!(spec.best && !spec.owned), wide ? 8 : 6);
-      if (wide && spec.look) {
+      const bw = Math.min(122, w - 76);
+      const b = btn(x + 8, y + h - 34, bw, 26, spec.owned ? "OWNED" : spec.buy, !!(spec.best && !spec.owned), 8);
+      if (spec.look) {
         ctx.save();
         roundRect(x, y, w, h, 10); ctx.clip();
         const sh = getLookAtlas(spec.look) || atlas;
@@ -2071,37 +2121,79 @@ html, body {
       return b;
     }
 
+    function drawPackCardNarrow(x, y, w, h, spec) {
+      ctx.fillStyle = "#161022";
+      roundRect(x, y, w, h, 8); ctx.fill();
+      ctx.strokeStyle = spec.stroke;
+      ctx.lineWidth = spec.best ? 3 : 2;
+      ctx.stroke();
+      const label = spec.owned ? "OWNED" : spec.buy;
+      const fs = label.length > 8 ? 6 : 7;
+      const bw = Math.min(118, Math.max(78, Math.ceil(measureTextW(label, fs) + 22)));
+      const bh = 28;
+      const textW = Math.max(80, w - bw - 22);
+      const bx = x + w - bw - 8;
+      const by = y + Math.round((h - bh) / 2);
+      pixelText(fitText(spec.title, 8, textW), x + 10, y + 14, 8, spec.stroke, "left");
+      const priceLine = spec.badge ? spec.price + "  BEST" : spec.price;
+      pixelText(fitText(priceLine, 10, textW), x + 10, y + 30, 10, spec.priceColor, "left");
+      pixelText(fitText(spec.perk, 6, textW), x + 10, y + 44, 6, "#c8b8d8", "left");
+      return btn(bx, by, bw, bh, label, !!(spec.best && !spec.owned), fs);
+    }
+
     const painterLook = { outfit: "rainbow", painter: "drip", squeegee: "neon", trail: "galaxy", shades: "neon", hat: "beanie", chain: "silver" };
     const hypeLook = { outfit: "hoodie", painter: "ami", squeegee: "fire", trail: "hype", shades: "hype", hat: "cap", chain: "none" };
     const founderLook = { outfit: "gold", painter: "golden", squeegee: "gold", trail: "hype", shades: "gold", hat: "crown", chain: "gold" };
 
-    ui.buyP = drawPackCard(packX0, packY, packW, packH, {
+    const painterSpec = {
       title: "PAINTER PACK", price: "$2.99", line1: "Painters and rainbow", line2: "No founder extras",
-      stroke: "#ff8ad4", priceColor: "#fff", buy: "BUY",
+      perk: "Painters and rainbow", stroke: "#ff8ad4", priceColor: "#fff", buy: "BUY",
       owned: !!(save.packs.painter || save.packs.founder), look: painterLook, face: -1
-    });
-    ui.buyH = drawPackCard(packX0 + packW + packGap, packY, packW, packH, {
+    };
+    const hypeSpec = {
       title: "HYPE PACK", price: "$4.99", line1: "Shades, trail, dance", line2: "Unlocks plus 1500",
-      stroke: "#ff8a1a", priceColor: "#ffd21f", buy: "BUY HYPE",
+      perk: "Shades, trail, dance", stroke: "#ff8a1a", priceColor: "#ffd21f", buy: "BUY HYPE",
       owned: !!(save.packs.hype || save.packs.founder), look: hypeLook
-    });
-    ui.buyF = drawPackCard(packX0 + (packW + packGap) * 2, packY, packW, packH, {
+    };
+    const founderSpec = {
       title: "FOUNDER PACK", price: "$9.99", line1: "Everything, gold Ami", line2: "Diamond, crown, 5000",
-      badge: "BEST VALUE", stroke: "#e6c040", priceColor: "#ffe14a", buy: "BUY FOUNDER",
+      perk: "Everything, 5000 coins", badge: "BEST VALUE", stroke: "#e6c040", priceColor: "#ffe14a", buy: "BUY FOUNDER",
       owned: !!save.packs.founder, look: founderLook, best: true
-    });
+    };
 
-    const packsBottom = packY + packH;
-    pixelText("After you pay, Stripe shows a code.", viewW / 2, packsBottom + 16, 7, "#c8b8d8");
-    pixelText("Enter it in the box below.", viewW / 2, packsBottom + 30, 7, "#c8b8d8");
-    if (shopMsg) pixelText(shopMsg, viewW / 2, packsBottom + 46, 8, shopMsgOk ? "#7ee67a" : "#ff8ad4");
+    let packsBottom;
+    if (wide) {
+      const packY = 38;
+      const packGap = 10;
+      const packH = 122;
+      const packW = Math.floor((viewW - 36 - packGap * 2) / 3);
+      const packX0 = 18;
+      ui.buyP = drawPackCardWide(packX0, packY, packW, packH, painterSpec);
+      ui.buyH = drawPackCardWide(packX0 + packW + packGap, packY, packW, packH, hypeSpec);
+      ui.buyF = drawPackCardWide(packX0 + (packW + packGap) * 2, packY, packW, packH, founderSpec);
+      packsBottom = packY + packH;
+      pixelText("After you pay, Stripe shows a code.", viewW / 2, packsBottom + 16, 7, "#c8b8d8");
+      pixelText("Enter it in the box below.", viewW / 2, packsBottom + 30, 7, "#c8b8d8");
+      if (shopMsg) pixelText(shopMsg, viewW / 2, packsBottom + 46, 8, shopMsgOk ? "#7ee67a" : "#ff8ad4");
+    } else {
+      const packX = 12;
+      const packW = viewW - 24;
+      const packH = 54;
+      const packGap = 6;
+      const packY = 34;
+      ui.buyP = drawPackCardNarrow(packX, packY, packW, packH, painterSpec);
+      ui.buyH = drawPackCardNarrow(packX, packY + packH + packGap, packW, packH, hypeSpec);
+      ui.buyF = drawPackCardNarrow(packX, packY + (packH + packGap) * 2, packW, packH, founderSpec);
+      packsBottom = packY + (packH + packGap) * 3 - packGap;
+      pixelText(fitText("After you pay, enter the Stripe code below.", 6, viewW - 28), viewW / 2, packsBottom + 12, 6, "#c8b8d8");
+    }
 
     const look = previewLook(shopTab, shopIndex);
-    const bottomBar = 48;
-    const prevX = 20;
-    const prevY = packsBottom + (wide ? 56 : 40);
-    const prevW = wide ? 200 : Math.min(128, Math.max(104, Math.floor(viewW * 0.34)));
-    const prevH = Math.max(110, Math.min(wide ? 148 : 168, VIEW_H - prevY - bottomBar));
+    const bottomBar = wide ? 48 : 56;
+    const prevX = wide ? 20 : 12;
+    const prevY = packsBottom + (wide ? 56 : 22);
+    const prevW = wide ? 200 : Math.min(118, Math.max(100, Math.floor(viewW * 0.32)));
+    const prevH = Math.max(110, Math.min(wide ? 148 : viewH, viewH - prevY - bottomBar));
 
     ctx.fillStyle = "#120c1c";
     roundRect(prevX, prevY, prevW, prevH, 10); ctx.fill();
@@ -2147,11 +2239,13 @@ html, body {
     const tabL = viewW < 520
       ? { fits: "FITS", faces: "FACES", gear: "GEAR", drip: "DRIP" }
       : { fits: "OUTFITS", faces: "PAINTERS", gear: "GEAR", drip: "EXTRA" };
-    const tabX = prevX + prevW + 12;
-    const tabW = Math.min(92, (viewW - tabX - 16) / 4 - 4);
+    const tabX = prevX + prevW + 10;
+    const colW = viewW - (wide ? 16 : 12) - tabX;
+    const tabW = Math.min(wide ? 92 : 70, (colW - 12) / 4);
+    const tabGap = Math.max(3, (colW - tabW * 4) / 3);
     for (let i = 0; i < tabs.length; i++) {
       const hot = shopTab === tabs[i];
-      ui["tab" + tabs[i]] = btn(tabX + i * (tabW + 5), prevY, tabW, 24, tabL[tabs[i]], hot, viewW < 520 ? 6 : 8);
+      ui["tab" + tabs[i]] = btn(tabX + i * (tabW + tabGap), prevY, tabW, 24, tabL[tabs[i]], hot, viewW < 520 ? 6 : 8);
     }
     const cat = catalogFor(shopTab);
     if (shopIndex >= cat.length) shopIndex = 0;
@@ -2160,13 +2254,6 @@ html, body {
       const it = row.item;
       const have = owns(row.type, it.id);
       const equipped = isEquipped(row.type, it.id);
-      pixelText(it.name.toUpperCase(), tabX + 4, prevY + 46, 8, "#fff", "left");
-      if (it.pack) {
-        ctx.fillStyle = it.pack === "founder" ? "#e6c040" : it.pack === "hype" ? "#ff8a1a" : "#ff8ad4";
-        roundRect(tabX + 4, prevY + 56, 48, 14, 4); ctx.fill();
-        pixelText("PACK", tabX + 28, prevY + 63, 7, "#111");
-      }
-      pixelText(itemBlurb(it), tabX + 4, prevY + 84, 7, "#c8b8d8", "left");
       let price = "OWNED";
       if (!have) {
         if (it.pack === "founder" && !hasPack("founder")) price = it.price ? it.price + " OR FOUNDER" : "FOUNDER PACK";
@@ -2177,28 +2264,53 @@ html, body {
         else price = "LOCKED";
       } else if (equipped) price = "EQUIPPED";
       const buyLabel = have ? (equipped ? "ON" : "EQUIP") : (it.price && (!it.pack || it.price > 0) ? "BUY" : "GET PACK");
-      const rowW = viewW - 16 - tabX;
-      const twoRow = rowW < 300;
-      const btnStack = twoRow ? 68 : 36;
-      pixelText(price, tabX + 4, prevY + prevH - btnStack - 14, 8, have ? "#7ee67a" : "#ffe14a", "left");
-      if (twoRow) {
-        const y1 = prevY + prevH - 64;
-        const y2 = prevY + prevH - 30;
-        ui.prev = btn(tabX, y1, 36, 28, "<", false);
-        ui.nextI = btn(tabX + 40, y1, 36, 28, ">", false);
-        ui.tryIt = btn(tabX + 82, y1, Math.max(72, Math.min(110, rowW - 82)), 28, tryIt.on ? "AGAIN" : "TRY IT", tryIt.on, 8);
-        ui.buyItem = btn(tabX, y2, rowW, 28, buyLabel, have && !equipped, 8);
-      } else {
+      const rowW = colW;
+
+      if (wide) {
+        pixelText(it.name.toUpperCase(), tabX + 4, prevY + 46, 8, "#fff", "left");
+        if (it.pack) {
+          ctx.fillStyle = it.pack === "founder" ? "#e6c040" : it.pack === "hype" ? "#ff8a1a" : "#ff8ad4";
+          roundRect(tabX + 4, prevY + 56, 48, 14, 4); ctx.fill();
+          pixelText("PACK", tabX + 28, prevY + 63, 7, "#111");
+        }
+        pixelText(itemBlurb(it), tabX + 4, prevY + 84, 7, "#c8b8d8", "left");
+        pixelText(price, tabX + 4, prevY + prevH - 50, 8, have ? "#7ee67a" : "#ffe14a", "left");
         ui.prev = btn(tabX, prevY + prevH - 32, 36, 28, "<", false);
         ui.nextI = btn(tabX + 40, prevY + prevH - 32, 36, 28, ">", false);
         ui.tryIt = btn(tabX + 82, prevY + prevH - 32, 72, 28, tryIt.on ? "AGAIN" : "TRY IT", tryIt.on, 8);
         const buyX = tabX + 160;
         const buyW = Math.max(64, Math.min(120, viewW - 16 - buyX));
         ui.buyItem = btn(buyX, prevY + prevH - 32, buyW, 28, buyLabel, have && !equipped, 8);
+      } else {
+        const nameY = prevY + 42;
+        pixelText(fitText(it.name.toUpperCase(), 8, rowW - 4), tabX + 2, nameY, 8, "#fff", "left");
+        let cursorY = nameY + 16;
+        if (it.pack) {
+          ctx.fillStyle = it.pack === "founder" ? "#e6c040" : it.pack === "hype" ? "#ff8a1a" : "#ff8ad4";
+          roundRect(tabX + 2, cursorY - 5, 44, 12, 3); ctx.fill();
+          pixelText("PACK", tabX + 24, cursorY + 1, 6, "#111");
+          cursorY += 16;
+        }
+        pixelText(fitText(price, 8, rowW - 4), tabX + 2, cursorY, 8, have ? "#7ee67a" : "#ffe14a", "left");
+        cursorY += 14;
+        const y1 = prevY + prevH - 64;
+        const y2 = prevY + prevH - 30;
+        const descBot = y1 - 8;
+        const lineH = 11;
+        const maxLines = Math.max(1, Math.min(3, Math.floor((descBot - cursorY + 4) / lineH)));
+        const lines = wrapText(itemBlurb(it), 6, rowW - 4, maxLines);
+        for (let li = 0; li < lines.length; li++) {
+          const ly = cursorY + li * lineH;
+          if (ly + 4 < y1) pixelText(lines[li], tabX + 2, ly, 6, "#c8b8d8", "left");
+        }
+        ui.prev = btn(tabX, y1, 36, 28, "<", false);
+        ui.nextI = btn(tabX + 40, y1, 36, 28, ">", false);
+        ui.tryIt = btn(tabX + 82, y1, Math.max(64, rowW - 82), 28, tryIt.on ? "AGAIN" : "TRY IT", tryIt.on, 8);
+        ui.buyItem = btn(tabX, y2, rowW, 28, buyLabel, have && !equipped, 8);
       }
     }
-    ui.back = btn(16, VIEW_H - 40, 96, 28, "BACK", false);
-    ui.goLocker = btn(122, VIEW_H - 40, 110, 28, "LOCKER", false);
+    ui.back = btn(16, viewH - 40, 96, 28, "BACK", false);
+    ui.goLocker = btn(122, viewH - 40, 110, 28, "LOCKER", false);
     drawShopToast();
   }
 
@@ -2220,7 +2332,7 @@ html, body {
       ctx.fillStyle = shopMsgOk
         ? "rgba(80,255,140," + (shopFlash * 0.22) + ")"
         : "rgba(255,50,90," + (shopFlash * 0.2) + ")";
-      ctx.fillRect(0, 0, viewW, VIEW_H);
+      ctx.fillRect(0, 0, viewW, viewH);
     }
   }
 
@@ -2291,12 +2403,14 @@ html, body {
     ui.goShop = btn(122, VIEW_H - 36, 96, 26, "SHOP", false);
   }
 
-    function layoutBox() {
-    const scale = Math.min(W / viewW, H / VIEW_H);
-    const dw = viewW * scale, dh = VIEW_H * scale;
+  function layoutBox() {
+    const vh = viewH || VIEW_H;
+    const scale = Math.min(W / viewW, H / vh);
+    const dw = viewW * scale, dh = vh * scale;
     const dx = (W - dw) / 2;
     const extraY = H - dh;
-    const dy = H > W * 1.15 ? extraY : extraY / 2;
+    const uiFill = state.mode === "shop";
+    const dy = (H > W * 1.15 && !uiFill) ? extraY : extraY / 2;
     return { scale: scale, dx: dx, dy: dy, dw: dw, dh: dh };
   }
 
@@ -2789,11 +2903,7 @@ html, body {
     }
     W = canvas.width;
     H = canvas.height;
-    if (H > 0) {
-      viewW = VIEW_H * (W / H);
-      if (viewW < 360) viewW = 360;
-      if (viewW > 980) viewW = 980;
-    }
+    if (H > 0) syncViewSize();
     const cx = (clientX - r.left) * (canvas.width / Math.max(1, r.width));
     const cy = (clientY - r.top) * (canvas.height / Math.max(1, r.height));
     const box = layoutBox();
@@ -2885,6 +2995,18 @@ html, body {
     if (ui.vshop && hitBtn(ui.vshop, p.x, p.y)) { Chip.sfx("ui"); setMode("shop"); }
   }
 
+  function syncViewSize() {
+    const aspect = W / Math.max(1, H);
+    viewW = VIEW_H * aspect;
+    if (viewW < 360) viewW = 360;
+    if (viewW > 980) viewW = 980;
+    viewH = VIEW_H;
+    if (state.mode === "shop") {
+      const fillH = Math.round(viewW / Math.max(0.05, aspect));
+      if (fillH > viewH) viewH = Math.min(780, fillH);
+    }
+  }
+
   function render() {
     W = canvas.width;
     H = canvas.height;
@@ -2898,9 +3020,7 @@ html, body {
       ctx.fillText("LOADING...", W / 2, H / 2);
       return;
     }
-    viewW = VIEW_H * (W / Math.max(1, H));
-    if (viewW < 360) viewW = 360;
-    if (viewW > 980) viewW = 980;
+    syncViewSize();
     draw();
   }
 
@@ -3118,6 +3238,7 @@ html, body {
         cans: cans.map(function (c) { return { x: c.x, y: c.y }; }),
         bubbles: bubbles.map(function (b) { return { x: b.x, y: b.y }; }),
         viewW: viewW,
+        viewH: viewH,
         camX: camX
       };
     },
