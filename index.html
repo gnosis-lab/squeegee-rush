@@ -7,7 +7,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#07010a">
-  <!-- squeegee-rush v5 -->
+  <!-- squeegee-rush v6 -->
   <title>SQUEEGEE RUSH — Ami Merchant Studios</title>
   <style>
 :root { --pad: env(safe-area-inset-bottom, 0px); }
@@ -255,6 +255,7 @@ html, body {
   const SWIPE_TIME = 0.42;
   const COMBO_WINDOW = 3.4;
   const SAVE_KEY = "squeegeeRush.v2";
+  const SETTINGS_KEY = "squeegeeRush.settings.v1";
 
   const RAINBOW = ["#ff3b4a", "#ff8a1a", "#ffd21f", "#3ee66a", "#32b4ff", "#8b5cff", "#ff4fd2"];
   const BUBBLE_LINES = ["HEY!!", "CUT IT OUT!", "KEEP IT DOWN!", "MY PROPERTY!", "I CAN HEAR YOU!", "NOT NOW!!", "QUIT IT!"];
@@ -274,7 +275,7 @@ html, body {
     3: { id: 3, name: "GALLERY", tag: "OPENING NIGHT", time: 65, solid: true, style: "marble", can: 1.25, bub: 4.0, critic: true, gaps: false }
   };
 
-  const GAME_VER = "v5";
+  const GAME_VER = "v6";
 
   const OUTFITS = [
     { id: "classic", name: "CLASSIC BLACK", short: "CLASSIC", price: 0, pack: null },
@@ -354,17 +355,17 @@ html, body {
     shades: "shades", hats: "hat", chains: "chain", emotes: "emote"
   };
   const POSE = {
-    idle:    { eyeX: 1,  eyeY: -86, capTop: -109, capBot: -94, faceBot: -72, shirtBot: -36, headW: 22 },
-    walk0:   { eyeX: 5,  eyeY: -83, capTop: -106, capBot: -92, faceBot: -70, shirtBot: -34, headW: 22 },
-    walk1:   { eyeX: 5,  eyeY: -83, capTop: -106, capBot: -92, faceBot: -70, shirtBot: -34, headW: 22 },
-    walk2:   { eyeX: 5,  eyeY: -83, capTop: -106, capBot: -92, faceBot: -70, shirtBot: -34, headW: 22 },
-    walk3:   { eyeX: 5,  eyeY: -83, capTop: -106, capBot: -92, faceBot: -70, shirtBot: -34, headW: 22 },
-    jump:    { eyeX: 20, eyeY: -63, capTop: -88,  capBot: -70, faceBot: -50, shirtBot: -22, headW: 24 },
-    victory: { eyeX: -1, eyeY: -89, capTop: -115, capBot: -100, faceBot: -76, shirtBot: -38, headW: 22 },
-    swipe0:  { eyeX: 1,  eyeY: -69, capTop: -93,  capBot: -76, faceBot: -56, shirtBot: -28, headW: 22 },
-    swipe1:  { eyeX: 2,  eyeY: -72, capTop: -96,  capBot: -78, faceBot: -58, shirtBot: -28, headW: 22 },
-    swipe2:  { eyeX: 2,  eyeY: -71, capTop: -97,  capBot: -79, faceBot: -58, shirtBot: -28, headW: 22 },
-    swipe3:  { eyeX: 3,  eyeY: -68, capTop: -91,  capBot: -76, faceBot: -56, shirtBot: -26, headW: 22 }
+    idle:    { eyeX: 1,  eyeY: -86, capTop: -109, capBot: -94, faceBot: -72, shirtBot: -36, headW: 22, handX: 21, handY: -36, sq: "hip" },
+    walk0:   { eyeX: 5,  eyeY: -83, capTop: -106, capBot: -92, faceBot: -70, shirtBot: -34, headW: 22, handX: 22, handY: -45, sq: "carry" },
+    walk1:   { eyeX: 5,  eyeY: -83, capTop: -106, capBot: -92, faceBot: -70, shirtBot: -34, headW: 22, handX: 22, handY: -45, sq: "carry" },
+    walk2:   { eyeX: 5,  eyeY: -83, capTop: -106, capBot: -92, faceBot: -70, shirtBot: -34, headW: 22, handX: 22, handY: -45, sq: "carry" },
+    walk3:   { eyeX: 5,  eyeY: -83, capTop: -106, capBot: -92, faceBot: -70, shirtBot: -34, headW: 22, handX: 21, handY: -45, sq: "carry" },
+    jump:    { eyeX: 20, eyeY: -63, capTop: -88,  capBot: -70, faceBot: -50, shirtBot: -22, headW: 24, handX: 45, handY: -71, sq: "raise" },
+    victory: { eyeX: -1, eyeY: -89, capTop: -115, capBot: -100, faceBot: -76, shirtBot: -38, headW: 22, handX: 34, handY: -105, sq: "raise" },
+    swipe0:  { eyeX: 1,  eyeY: -69, capTop: -93,  capBot: -76, faceBot: -56, shirtBot: -28, headW: 22, handX: 33, handY: -57, sq: "swipe" },
+    swipe1:  { eyeX: 2,  eyeY: -72, capTop: -96,  capBot: -78, faceBot: -58, shirtBot: -28, headW: 22, handX: 24, handY: -61, sq: "swipe" },
+    swipe2:  { eyeX: 2,  eyeY: -71, capTop: -97,  capBot: -79, faceBot: -58, shirtBot: -28, headW: 22, handX: 24, handY: -66, sq: "swipe" },
+    swipe3:  { eyeX: 3,  eyeY: -68, capTop: -91,  capBot: -76, faceBot: -56, shirtBot: -26, headW: 22, handX: 21, handY: -55, sq: "swipe" }
   };
   function poseOf(name) { return POSE[name] || POSE.idle; }
 
@@ -419,7 +420,39 @@ html, body {
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) {}
   }
 
+  function defaultSettings() {
+    return { music: 1, sfx: 1, shake: true, touch: true };
+  }
+  function loadSettings() {
+    try {
+      const raw = localStorage.getItem(SETTINGS_KEY);
+      if (!raw) return defaultSettings();
+      const s = JSON.parse(raw);
+      return Object.assign(defaultSettings(), s);
+    } catch (e) {
+      return defaultSettings();
+    }
+  }
+  function writeSettings() {
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (e) {}
+  }
+  function volIndex(v) {
+    const steps = [0, 0.25, 0.5, 0.75, 1];
+    let best = 0, bd = 99;
+    for (let i = 0; i < steps.length; i++) {
+      const d = Math.abs(steps[i] - v);
+      if (d < bd) { bd = d; best = i; }
+    }
+    return best;
+  }
+  const VOL_STEPS = [0, 0.25, 0.5, 0.75, 1];
+  const VOL_LABELS = ["OFF", "LOW", "MID", "HIGH", "MAX"];
+
   let save = loadSave();
+  let settings = loadSettings();
+  let overlay = null;
+  let overlayFrom = "title";
+  let debugFrame = null;
   let dailyToast = 0;
   if (save.lastLogin !== todayKey()) {
     save.lastLogin = todayKey();
@@ -500,13 +533,22 @@ html, body {
       this.master.gain.value = 0.3;
       this.master.connect(this.ctx.destination);
       this.music = this.ctx.createGain();
-      this.music.gain.value = 0.32;
       this.music.connect(this.master);
+      this.sfxBus = this.ctx.createGain();
+      this.sfxBus.connect(this.master);
+      this.applyAudio();
       this.next = this.ctx.currentTime + 0.05;
       this.step = 0;
     },
+    applyAudio: function () {
+      const mute = !!this.muted;
+      if (this.music) this.music.gain.value = (mute || settings.music <= 0) ? 0 : 0.32 * settings.music;
+      if (this.sfxBus) this.sfxBus.gain.value = (mute || settings.sfx <= 0) ? 0 : settings.sfx;
+    },
     tick: function () {
       if (!this.ctx || this.muted || this.ctx.state === "suspended") return;
+      if (settings.music <= 0) return;
+      if (overlay && (state.mode === "play" || state.mode === "intro")) return;
       const eighth = 60 / 138 / 2;
       while (this.next < this.ctx.currentTime + 0.28) {
         this.sched(this.next, this.step);
@@ -552,8 +594,8 @@ html, body {
       src.start(t); src.stop(t + dur + 0.02);
     },
     sfx: function (name) {
-      if (!this.ctx || this.muted) return;
-      const t = this.ctx.currentTime, m = this.master;
+      if (!this.ctx || this.muted || settings.sfx <= 0) return;
+      const t = this.ctx.currentTime, m = this.sfxBus || this.master;
       if (name === "jump") {
         const o = this.ctx.createOscillator(), g = this.ctx.createGain();
         o.type = "square"; o.frequency.setValueAtTime(280, t); o.frequency.exponentialRampToValueAtTime(640, t + 0.1);
@@ -642,7 +684,7 @@ html, body {
     const row = cat[Math.max(0, Math.min(index, cat.length - 1))];
     if (row.type === "outfits") look.outfit = row.item.id;
     if (row.type === "painters") look.painter = row.item.id;
-    if (row.type === "squeegees") look.squeegee = row.item.id;
+    if (row.type === "squeegees") { look.squeegee = row.item.id; look._sqPreview = true; }
     if (row.type === "trails") look.trail = row.item.id;
     if (row.type === "shades") { look.shades = row.item.id; look._strictShades = true; }
     if (row.type === "hats") { look.hat = row.item.id; look._strictHat = true; }
@@ -763,19 +805,11 @@ html, body {
 
       if (colorful && !skinPx) {
         const lum = hsl.max / 255;
-        if (look.trail === "galaxy") {
-          d[i] = Math.min(255, 90 + lum * 150); d[i + 1] = 40 + lum * 50; d[i + 2] = Math.min(255, 170 + lum * 85);
-        } else if (look.trail === "money") {
-          d[i] = 40 + lum * 70; d[i + 1] = Math.min(255, 150 + lum * 105); d[i + 2] = 30 + lum * 40;
-        } else if (look.trail === "fire") {
-          d[i] = Math.min(255, 190 + lum * 65); d[i + 1] = Math.min(255, 50 + lum * 140); d[i + 2] = 16;
-        } else if (look.trail === "hearts") {
-          d[i] = Math.min(255, 200 + lum * 55); d[i + 1] = 50 + lum * 90; d[i + 2] = Math.min(255, 120 + lum * 80);
-        } else if (look.trail === "lightning") {
-          d[i] = Math.min(255, 220 + lum * 35); d[i + 1] = Math.min(255, 210 + lum * 45); d[i + 2] = 40 + lum * 180;
-        } else if (look.trail === "hype") {
-          d[i] = Math.min(255, 210 + lum * 45); d[i + 1] = Math.min(255, 50 + lum * 150); d[i + 2] = 12 + lum * 30;
+        const paintKey = look._sqPreview ? look.squeegee : look.trail;
+        if (look._sqPreview && (paintKey === "classic" || !paintKey)) {
+          continue;
         }
+        applyPaintTint(d, i, paintKey, lum, x, y);
         continue;
       }
       if (skinPx && skin) {
@@ -785,28 +819,17 @@ html, body {
         d[i + 2] = Math.min(255, skin[2] * (0.55 + lum * 0.7));
         continue;
       }
-      if (hsl.lum > 200 && hsl.sat < 0.22) continue;
-      if (swipe && hsl.sat < 0.22 && hsl.lum > 75 && hsl.lum < 215) {
-        const lum = hsl.max / 255;
-        if (look.squeegee === "gold") {
-          d[i] = Math.min(255, 200 + lum * 55); d[i + 1] = Math.min(255, 150 + lum * 70); d[i + 2] = 40 + lum * 40;
-        } else if (look.squeegee === "neon") {
-          d[i] = 30 + lum * 40; d[i + 1] = Math.min(255, 220 + lum * 35); d[i + 2] = Math.min(255, 210 + lum * 45);
-        } else if (look.squeegee === "fire") {
-          d[i] = Math.min(255, 230); d[i + 1] = 80 + lum * 120; d[i + 2] = 20;
-        } else if (look.squeegee === "ice") {
-          d[i] = 140 + lum * 80; d[i + 1] = Math.min(255, 210 + lum * 45); d[i + 2] = 255;
-        } else if (look.squeegee === "lightning") {
-          d[i] = 255; d[i + 1] = Math.min(255, 220 + lum * 35); d[i + 2] = 50 + lum * 80;
-        } else if (look.squeegee === "graffiti") {
-          const c = hslish(((x + y * 3) * 18) % 360, 0.85, 0.45 + lum * 0.2);
-          d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2];
-        } else if (look.squeegee === "diamond") {
-          const tw = ((x * 13 + y * 7) % 5) === 0;
-          d[i] = tw ? 255 : 190 + lum * 65; d[i + 1] = tw ? 255 : 230 + lum * 20; d[i + 2] = 255;
-        }
+      if (swipe && !skinPx && relY < -28 && relX > 8 && hsl.sat < 0.32 && hsl.lum > 48) {
+        const pal = squeegeePal(look.squeegee || "classic");
+        const isBlade = relY < (pose.handY || -60) - 10 || relX > (pose.handX || 24) + 8;
+        const hex = isBlade
+          ? (hsl.lum > 186 ? pal.hi : (hsl.lum > 118 ? pal.b : pal.bd))
+          : (hsl.lum > 140 ? pal.h : pal.hd);
+        const col = hexToRgb(hex);
+        d[i] = col[0]; d[i + 1] = col[1]; d[i + 2] = col[2];
         continue;
       }
+      if (hsl.lum > 200 && hsl.sat < 0.22) continue;
       if (hsl.lum < 96) {
         if (part === "head") continue;
         const dark = (r + g + b) / 3 < 40;
@@ -818,6 +841,114 @@ html, body {
 
   function hexToRgb(h) {
     return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  }
+
+  function applyPaintTint(d, i, key, lum, x, y) {
+    if (key === "galaxy") {
+      d[i] = Math.min(255, 90 + lum * 150); d[i + 1] = 40 + lum * 50; d[i + 2] = Math.min(255, 170 + lum * 85);
+    } else if (key === "money") {
+      d[i] = 40 + lum * 70; d[i + 1] = Math.min(255, 150 + lum * 105); d[i + 2] = 30 + lum * 40;
+    } else if (key === "fire") {
+      d[i] = Math.min(255, 190 + lum * 65); d[i + 1] = Math.min(255, 50 + lum * 140); d[i + 2] = 16;
+    } else if (key === "hearts") {
+      d[i] = Math.min(255, 200 + lum * 55); d[i + 1] = 50 + lum * 90; d[i + 2] = Math.min(255, 120 + lum * 80);
+    } else if (key === "lightning") {
+      d[i] = Math.min(255, 220 + lum * 35); d[i + 1] = Math.min(255, 210 + lum * 45); d[i + 2] = 40 + lum * 180;
+    } else if (key === "hype") {
+      d[i] = Math.min(255, 210 + lum * 45); d[i + 1] = Math.min(255, 50 + lum * 150); d[i + 2] = 12 + lum * 30;
+    } else if (key === "ice") {
+      d[i] = 150 + lum * 90; d[i + 1] = Math.min(255, 210 + lum * 45); d[i + 2] = 255;
+    } else if (key === "neon") {
+      d[i] = 20 + lum * 50; d[i + 1] = Math.min(255, 220 + lum * 35); d[i + 2] = Math.min(255, 210 + lum * 45);
+    } else if (key === "graffiti") {
+      const c = hslish(((x + y * 3) * 18) % 360, 0.85, 0.45 + lum * 0.2);
+      d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2];
+    } else if (key === "diamond") {
+      const tw = ((x * 13 + y * 7) % 5) === 0;
+      d[i] = tw ? 255 : 190 + lum * 65; d[i + 1] = tw ? 255 : 230 + lum * 20; d[i + 2] = 255;
+    } else if (key === "gold") {
+      d[i] = Math.min(255, 200 + lum * 55); d[i + 1] = Math.min(255, 150 + lum * 70); d[i + 2] = 40 + lum * 40;
+    }
+  }
+
+  function squeegeeColors(id) {
+    if (id === "neon") return ["#14e8e0", "#ff4fd2", "#32b4ff", "#fff"];
+    if (id === "ice") return ["#e8f8ff", "#7ec8ff", "#32b4ff", "#fff"];
+    if (id === "graffiti") return ["#ff3b4a", "#ffe14a", "#8b5cff", "#3ee66a", "#32b4ff"];
+    if (id === "lightning") return ["#ffe14a", "#fff", "#7ec8ff", "#fff6c2"];
+    if (id === "fire") return ["#ff3b1a", "#ff8a1a", "#ffd21f", "#fff"];
+    if (id === "diamond") return ["#e8f4ff", "#7ec8ff", "#fff", "#c8f4ff"];
+    if (id === "gold") return ["#ffe14a", "#e6c040", "#fff6c2", "#fff"];
+    return RAINBOW;
+  }
+
+  function squeegeePal(style) {
+    const pals = {
+      classic: { h: "#b07840", hd: "#6a4420", b: "#d0d6dc", bd: "#8a9298", hi: "#f2f4f6", x: "#c8d0d8" },
+      neon: { h: "#14141c", hd: "#08080c", b: "#14e8e0", bd: "#0a7874", hi: "#e8ffff", x: "#ff4fd2" },
+      ice: { h: "#7eb8d0", hd: "#3a7088", b: "#e0f4ff", bd: "#7ec8ff", hi: "#ffffff", x: "#b8e8ff" },
+      graffiti: { h: "#2a2030", hd: "#141018", b: "#ff3b4a", bd: "#8b5cff", hi: "#ffe14a", x: "#3ee66a" },
+      lightning: { h: "#2a2810", hd: "#141408", b: "#ffe14a", bd: "#c4a020", hi: "#ffffff", x: "#7ec8ff" },
+      fire: { h: "#3a1c10", hd: "#1c0c08", b: "#ff4a10", bd: "#a02808", hi: "#ffd21f", x: "#ff8a1a" },
+      diamond: { h: "#90a0b0", hd: "#586878", b: "#e8f4ff", bd: "#80c8e8", hi: "#ffffff", x: "#c8f4ff" },
+      gold: { h: "#c4a028", hd: "#7a6018", b: "#ffe14a", bd: "#c49420", hi: "#fff6c2", x: "#e6c040" }
+    };
+    return pals[style] || pals.classic;
+  }
+
+  function decorateBlade(bx, by, bw, bh, style, pal) {
+    if (style === "ice") {
+      px(bx + 4, by - 3, 2, 2);
+      ctx.fillStyle = pal.hi; px(bx + 4, by - 3, 2, 2);
+      ctx.fillStyle = pal.x; px(bx + 12, by - 2, 2, 2);
+      ctx.fillStyle = "#7ec8ff"; px(bx + 8, by + bh, 2, 2);
+    } else if (style === "fire") {
+      ctx.fillStyle = "#ff8a1a"; px(bx + 3, by - 3, 3, 3);
+      ctx.fillStyle = "#ffd21f"; px(bx + 8, by - 5, 2, 4);
+      ctx.fillStyle = "#ff4a10"; px(bx + 13, by - 3, 3, 3);
+    } else if (style === "lightning") {
+      ctx.fillStyle = "#fff"; px(bx + 8, by - 5, 2, 3); px(bx + 6, by - 2, 2, 2);
+      ctx.fillStyle = pal.b; px(bx + 10, by - 3, 2, 2);
+    } else if (style === "neon") {
+      ctx.fillStyle = pal.x; px(bx - 1, by, 1, bh); px(bx + bw, by, 1, bh);
+    } else if (style === "graffiti") {
+      ctx.fillStyle = "#32b4ff"; px(bx + 3, by + 1, 4, 3);
+      ctx.fillStyle = "#ffe14a"; px(bx + 8, by, 4, 3);
+      ctx.fillStyle = "#8b5cff"; px(bx + 13, by + 2, 3, 3);
+      ctx.fillStyle = "#ff3b4a"; px(bx + 6, by + bh, 2, 3);
+    } else if (style === "diamond") {
+      ctx.fillStyle = "#fff"; px(bx + 5, by - 2, 2, 2); px(bx + 14, by - 1, 1, 1);
+      ctx.fillStyle = pal.x; px(bx + 11, by + 1, 2, 2);
+    } else if (style === "gold") {
+      ctx.fillStyle = "#fff6c2"; px(bx + 4, by, 3, 1); px(bx + bw - 5, by + 2, 2, 1);
+    }
+  }
+
+  function drawBladeBox(bx, by, bw, bh, pal, style) {
+    ctx.fillStyle = pal.bd; px(bx, by + 1, bw, bh - 1);
+    ctx.fillStyle = pal.b; px(bx + 1, by, bw - 2, bh - 2);
+    ctx.fillStyle = pal.hi; px(bx + 2, by, Math.max(3, (bw / 3) | 0), 2);
+    decorateBlade(bx, by, bw, bh, style, pal);
+  }
+
+  function drawSqueegeeAt(hx, hy, kind, style) {
+    if (hx == null || hy == null) return;
+    hx |= 0; hy |= 0;
+    const pal = squeegeePal(style);
+    if (kind === "swipe") {
+      decorateBlade(hx + 10, hy - 18, 16, 6, style, pal);
+      return;
+    }
+    if (kind === "raise") {
+      ctx.fillStyle = pal.h; px(hx - 1, hy - 12, 4, 16);
+      ctx.fillStyle = pal.hd; px(hx + 2, hy - 12, 1, 16);
+      drawBladeBox(hx - 9, hy - 17, 19, 6, pal, style);
+      return;
+    }
+    const fwd = kind === "carry" ? 1 : 0;
+    ctx.fillStyle = pal.h; px(hx - 1 + fwd, hy - 8, 4, 14);
+    ctx.fillStyle = pal.hd; px(hx + 2 + fwd, hy - 8, 1, 14);
+    drawBladeBox(hx - 8 + fwd, hy - 13, 18, 6, pal, style);
   }
   function hslish(h, s, l) {
     const c = (1 - Math.abs(2 * l - 1)) * s;
@@ -835,7 +966,7 @@ html, body {
   }
 
   function getLookAtlas(look) {
-    const key = (look.outfit || "classic") + "|" + (look.painter || "ami") + "|" + (look.squeegee || "classic") + "|" + (look.trail || "rainbow") + "|" + (look.hat || "cap");
+    const key = (look.outfit || "classic") + "|" + (look.painter || "ami") + "|" + (look.squeegee || "classic") + "|" + (look.trail || "rainbow") + "|" + (look.hat || "cap") + "|" + (look._sqPreview ? "sqfx" : "trfx");
     if (lookCache[key]) return lookCache[key];
     if (!atlas) return null;
     const cnv = document.createElement("canvas");
@@ -1024,6 +1155,8 @@ html, body {
     if (look) {
       drawOutfitExtras(look, name);
       drawAccessories(facing, look, name);
+      const pose = poseOf(name);
+      drawSqueegeeAt(pose.handX, pose.handY, pose.sq, look.squeegee || "classic");
     }
     ctx.restore();
   }
@@ -1188,13 +1321,21 @@ html, body {
     return !e.painted && Math.abs(player.x - e.x) < 70 && Math.abs(player.y - e.y) < 80;
   }
 
+  function isFrozen() {
+    return !!(overlay && (state.mode === "play" || state.mode === "intro"));
+  }
+
   function update(dt) {
     if (dt > 0.05) dt = 0.05;
     Chip.tick();
-    if (shake > 0) shake = Math.max(0, shake - dt * 28);
-    if (flash > 0) flash = Math.max(0, flash - dt);
+    if (!isFrozen()) {
+      if (shake > 0) shake = Math.max(0, shake - dt * 28);
+      if (flash > 0) flash = Math.max(0, flash - dt);
+    }
     if (dailyToast > 0) dailyToast -= dt;
     if (shopMsgT > 0) shopMsgT -= dt;
+
+    if (isFrozen()) return;
 
     if (state.mode === "title" || state.mode === "shop" || state.mode === "locker") {
       state.titleT += dt;
@@ -1295,6 +1436,7 @@ html, body {
 
     if (pressed.swipe && !blocked && !player.swiping) {
       player.swiping = true; player.swipeT = 0; Chip.sfx("swipe"); tryPaint();
+      burst(player.x + player.facing * 38, player.y - 68, save.equipped.squeegee === "classic" ? 6 : 12, squeegeeColors(save.equipped.squeegee), 170);
     }
     if (player.swiping) {
       player.swipeT += dt;
@@ -1371,6 +1513,7 @@ html, body {
   }
 
   function frameName() {
+    if (debugFrame) return debugFrame;
     if (state.mode === "victory") {
       const em = (save.equipped && save.equipped.emote) || "wave";
       if (em === "moonwalk" || em === "spin") return "walk" + (Math.floor(state.overT * 9) % 4);
@@ -1564,8 +1707,12 @@ html, body {
   function drawHud() {
     if (hideChromeFlag) return;
     const pad = 10;
+    const pauseW = 40, pauseH = 40;
+    const pauseX = viewW - 12 - pauseW;
+    const pauseY = 8;
+    const scoreW = viewW < 520 ? 124 : 168;
     ctx.fillStyle = "rgba(10,8,16,0.55)";
-    roundRect(pad, 8, 168, 54, 8); ctx.fill();
+    roundRect(pad, 8, scoreW, 54, 8); ctx.fill();
     ctx.fillStyle = "#ffe14a"; ctx.font = "11px '" + FONT + "', monospace";
     ctx.textAlign = "left"; ctx.textBaseline = "top";
     ctx.fillText("SCORE " + state.score, pad + 10, 14);
@@ -1574,17 +1721,28 @@ html, body {
     ctx.fillStyle = "#7ec8ee";
     ctx.fillText(Math.ceil(state.time) + "s", pad + 10, 44);
 
+    const coinW = 122;
+    const coinX = pauseX - 8 - coinW;
     ctx.fillStyle = "rgba(10,8,16,0.55)";
-    roundRect(viewW - 148, 8, 138, 36, 8); ctx.fill();
+    roundRect(coinX, 8, coinW, 36, 8); ctx.fill();
     ctx.fillStyle = "#ffe14a"; ctx.font = "10px '" + FONT + "', monospace";
     ctx.textAlign = "right";
-    ctx.fillText(save.coins + " COINS", viewW - 20, 14);
+    ctx.fillText(save.coins + " COINS", coinX + coinW - 8, 14);
     ctx.fillStyle = "#ff8ad4"; ctx.font = "8px '" + FONT + "', monospace";
-    ctx.fillText(state.combo > 1 ? "COMBO x" + (state.combo - 1) : "COMBO --", viewW - 20, 30);
+    ctx.fillText(state.combo > 1 ? "COMBO x" + (state.combo - 1) : "COMBO --", coinX + coinW - 8, 30);
     if (save.founderBadge) {
       ctx.fillStyle = "#e6c040"; ctx.font = "7px '" + FONT + "', monospace";
-      ctx.fillText("FOUNDER", viewW - 20, 48);
+      ctx.fillText("FOUNDER", coinX + coinW - 8, 48);
     }
+
+    ui.pause = { x: pauseX, y: pauseY, w: pauseW, h: pauseH };
+    ctx.fillStyle = "rgba(10,8,16,0.62)";
+    roundRect(pauseX, pauseY, pauseW, pauseH, 8); ctx.fill();
+    ctx.strokeStyle = "#ffe14a"; ctx.lineWidth = 2;
+    roundRect(pauseX, pauseY, pauseW, pauseH, 8); ctx.stroke();
+    ctx.fillStyle = "#ffe14a";
+    px(pauseX + 11, pauseY + 10, 6, 20);
+    px(pauseX + 23, pauseY + 10, 6, 20);
   }
 
   function pixelText(text, x, y, size, color, align) {
@@ -1625,7 +1783,8 @@ html, body {
     const bw = Math.min(150, (viewW - 36) / 2);
     ui.play = btn(viewW / 2 - bw - 6, by, bw, 36, "PLAY  L" + selectedLevel, true);
     ui.shop = btn(viewW / 2 + 6, by, bw, 36, "SHOP", false);
-    ui.locker = btn(viewW / 2 - bw - 6, by + 42, bw * 2 + 12, 32, "LOCKER", false);
+    ui.locker = btn(viewW / 2 - bw - 6, by + 42, bw, 32, "LOCKER", false);
+    ui.settings = btn(viewW / 2 + 6, by + 42, bw, 32, "SETTINGS", false);
 
     pixelText("LEVEL", 18, 372, 8, "#ffe14a", "left");
     const lw = Math.min(108, (viewW - 48) / 3);
@@ -1763,8 +1922,9 @@ html, body {
   }
 
   function pulseTryFx(cx, cy, look) {
-    const cols = trailColorsFor(look.trail);
-    const n = (look.trail === "lightning" || look.trail === "hype") ? 8 : 5;
+    const sqPrev = tryIt.kind === "squeegees" || look._sqPreview;
+    const cols = sqPrev ? squeegeeColors(look.squeegee) : trailColorsFor(look.trail);
+    const n = (sqPrev || look.trail === "lightning" || look.trail === "hype") ? 8 : 5;
     for (let i = 0; i < n; i++) {
       tryFx.push({
         x: cx + 24 + Math.random() * 46,
@@ -2008,8 +2168,8 @@ html, body {
   }
 
   function draw() {
-    const ox = (Math.random() * 2 - 1) * shake;
-    const oy = (Math.random() * 2 - 1) * shake;
+    const ox = settings.shake ? (Math.random() * 2 - 1) * shake : 0;
+    const oy = settings.shake ? (Math.random() * 2 - 1) * shake : 0;
     ctx.save();
     ctx.imageSmoothingEnabled = false;
     const box = layoutBox();
@@ -2066,10 +2226,14 @@ html, body {
 
     if (state.mode === "play" || state.mode === "intro") drawHud();
     if (state.mode === "title") drawTitle();
-    if (state.mode === "intro") drawIntro();
+    if (state.mode === "intro" && !isFrozen()) drawIntro();
     if (state.mode === "victory") drawVictory();
     if (state.mode === "shop") drawShop();
     if (state.mode === "locker") drawLocker();
+    if (overlay === "pause" || overlay === "confirmQuit") drawPauseMenu();
+    if (overlay === "settings" || overlay === "confirmReset") drawSettings();
+    if (overlay === "confirmQuit") drawConfirm("LEAVE THIS RUN?", "This run will not be saved.", "YES", "NO");
+    if (overlay === "confirmReset") drawConfirm("ERASE ALL PROGRESS?", "Unlock codes still work.", "YES", "NO");
 
     if (flash > 0) { ctx.fillStyle = "rgba(255,40,70," + (flash * 0.35) + ")"; ctx.fillRect(-20, -20, viewW + 40, VIEW_H + 40); }
     ctx.restore();
@@ -2110,16 +2274,187 @@ html, body {
     Chip.sfx("ui");
   }
 
+  function panelRect(w, h) {
+    return { x: Math.round((viewW - w) / 2), y: Math.round((VIEW_H - h) / 2), w: w, h: h };
+  }
+
+  function drawDim() {
+    ctx.fillStyle = "rgba(8,6,16,0.72)";
+    ctx.fillRect(0, 0, viewW, VIEW_H);
+  }
+
+  function drawPauseMenu() {
+    drawDim();
+    const wide = viewW >= 420;
+    const w = Math.min(300, viewW - 32);
+    const h = 250;
+    const r = panelRect(w, h);
+    ctx.fillStyle = "#161022";
+    roundRect(r.x, r.y, r.w, r.h, 12); ctx.fill();
+    ctx.strokeStyle = "#ffe14a"; ctx.lineWidth = 3;
+    roundRect(r.x, r.y, r.w, r.h, 12); ctx.stroke();
+    pixelText("PAUSED", viewW / 2, r.y + 28, 16, "#ffe14a");
+    const bw = r.w - 40;
+    const bx = r.x + 20;
+    let by = r.y + 56;
+    ui.resume = btn(bx, by, bw, 34, "RESUME", true);
+    by += 42;
+    ui.restart = btn(bx, by, bw, 34, "RESTART LEVEL", false, 8);
+    by += 42;
+    ui.goSettings = btn(bx, by, bw, 34, "SETTINGS", false);
+    by += 42;
+    ui.goMenu = btn(bx, by, bw, 34, "MAIN MENU", false);
+  }
+
+  function drawSettings() {
+    drawDim();
+    const w = Math.min(340, viewW - 24);
+    const h = 318;
+    const r = panelRect(w, h);
+    ctx.fillStyle = "#161022";
+    roundRect(r.x, r.y, r.w, r.h, 12); ctx.fill();
+    ctx.strokeStyle = "#ffe14a"; ctx.lineWidth = 3;
+    roundRect(r.x, r.y, r.w, r.h, 12); ctx.stroke();
+    pixelText("SETTINGS", viewW / 2, r.y + 24, 14, "#ffe14a");
+
+    function row(label, y, controlW) {
+      pixelText(label, r.x + 18, y + 14, 8, "#c8b8d8", "left");
+      return r.x + r.w - 18 - controlW;
+    }
+
+    let y = r.y + 50;
+    const ctrlW = 168;
+    let cx = row("MUSIC", y, ctrlW);
+    ui.musL = btn(cx, y, 32, 28, "<", false, 10);
+    pixelText(VOL_LABELS[volIndex(settings.music)], cx + 84, y + 15, 8, "#fff");
+    ui.musR = btn(cx + ctrlW - 32, y, 32, 28, ">", false, 10);
+    y += 40;
+    cx = row("SFX", y, ctrlW);
+    ui.sfxL = btn(cx, y, 32, 28, "<", false, 10);
+    pixelText(VOL_LABELS[volIndex(settings.sfx)], cx + 84, y + 15, 8, "#fff");
+    ui.sfxR = btn(cx + ctrlW - 32, y, 32, 28, ">", false, 10);
+    y += 40;
+    cx = row("SHAKE", y, 80);
+    ui.shake = btn(cx, y, 80, 28, settings.shake ? "ON" : "OFF", settings.shake, 8);
+    y += 40;
+    cx = row("TOUCH PAD", y, 80);
+    ui.touch = btn(cx, y, 80, 28, settings.touch ? "ON" : "OFF", settings.touch, 8);
+    y += 48;
+    ui.resetProg = btn(r.x + 20, y, r.w - 40, 32, "RESET PROGRESS", false, 8);
+    y += 42;
+    ui.backSettings = btn(r.x + 20, y, r.w - 40, 34, "BACK", true);
+  }
+
+  function drawConfirm(title, sub, yesLab, noLab) {
+    ctx.fillStyle = "rgba(8,6,16,0.55)";
+    ctx.fillRect(0, 0, viewW, VIEW_H);
+    const w = Math.min(300, viewW - 32);
+    const h = 160;
+    const r = panelRect(w, h);
+    ctx.fillStyle = "#1a1020";
+    roundRect(r.x, r.y, r.w, r.h, 12); ctx.fill();
+    ctx.strokeStyle = "#ff8ad4"; ctx.lineWidth = 3;
+    roundRect(r.x, r.y, r.w, r.h, 12); ctx.stroke();
+    pixelText(title, viewW / 2, r.y + 32, 10, "#ffe14a");
+    pixelText(sub, viewW / 2, r.y + 58, 7, "#c8b8d8");
+    const bw = (r.w - 48) / 2;
+    ui.yes = btn(r.x + 16, r.y + h - 50, bw, 34, yesLab, false, 8);
+    ui.no = btn(r.x + 32 + bw, r.y + h - 50, bw, 34, noLab, true, 8);
+  }
+
+  function bumpVol(key, dir) {
+    let i = volIndex(settings[key]) + dir;
+    if (i < 0) i = 0;
+    if (i > 4) i = 4;
+    settings[key] = VOL_STEPS[i];
+    writeSettings();
+    Chip.init();
+    Chip.applyAudio();
+    Chip.sfx("ui");
+  }
+
+  function pauseGame() {
+    if (state.mode !== "play" && state.mode !== "intro") return;
+    overlay = "pause";
+    overlayFrom = "pause";
+    input.left = false; input.right = false; input.jump = false; input.swipe = false;
+    pressed.jump = false; pressed.swipe = false;
+    Chip.sfx("ui");
+    syncChrome();
+  }
+
+  function resumeGame() {
+    overlay = null;
+    Chip.sfx("ui");
+    syncChrome();
+  }
+
+  function doResetProgress() {
+    save = defaultSave();
+    writeSave();
+    lookCache = {};
+    selectedLevel = 1;
+    currentLevel = 1;
+  }
+
+  function handleEscape() {
+    if (overlay === "confirmQuit") { overlay = "pause"; Chip.sfx("ui"); return; }
+    if (overlay === "confirmReset") { overlay = "settings"; Chip.sfx("ui"); return; }
+    if (overlay === "settings") {
+      overlay = overlayFrom === "pause" ? "pause" : null;
+      Chip.sfx("ui");
+      syncChrome();
+      return;
+    }
+    if (overlay === "pause") { resumeGame(); return; }
+    if (state.mode === "play" || state.mode === "intro") pauseGame();
+  }
+
+  function handleOverlay(p) {
+    if (overlay === "confirmQuit") {
+      if (ui.yes && hitBtn(ui.yes, p.x, p.y)) { overlay = null; Chip.sfx("ui"); setMode("title"); return; }
+      if (ui.no && hitBtn(ui.no, p.x, p.y)) { overlay = "pause"; Chip.sfx("ui"); return; }
+      return;
+    }
+    if (overlay === "confirmReset") {
+      if (ui.yes && hitBtn(ui.yes, p.x, p.y)) { doResetProgress(); overlay = "settings"; Chip.sfx("hit"); return; }
+      if (ui.no && hitBtn(ui.no, p.x, p.y)) { overlay = "settings"; Chip.sfx("ui"); return; }
+      return;
+    }
+    if (overlay === "pause") {
+      if (ui.resume && hitBtn(ui.resume, p.x, p.y)) { resumeGame(); return; }
+      if (ui.restart && hitBtn(ui.restart, p.x, p.y)) { overlay = null; startLevel(currentLevel); return; }
+      if (ui.goSettings && hitBtn(ui.goSettings, p.x, p.y)) { overlay = "settings"; overlayFrom = "pause"; Chip.sfx("ui"); return; }
+      if (ui.goMenu && hitBtn(ui.goMenu, p.x, p.y)) { overlay = "confirmQuit"; Chip.sfx("ui"); return; }
+      return;
+    }
+    if (overlay === "settings") {
+      if (ui.musL && hitBtn(ui.musL, p.x, p.y)) bumpVol("music", -1);
+      if (ui.musR && hitBtn(ui.musR, p.x, p.y)) bumpVol("music", 1);
+      if (ui.sfxL && hitBtn(ui.sfxL, p.x, p.y)) bumpVol("sfx", -1);
+      if (ui.sfxR && hitBtn(ui.sfxR, p.x, p.y)) bumpVol("sfx", 1);
+      if (ui.shake && hitBtn(ui.shake, p.x, p.y)) { settings.shake = !settings.shake; writeSettings(); Chip.sfx("ui"); }
+      if (ui.touch && hitBtn(ui.touch, p.x, p.y)) { settings.touch = !settings.touch; writeSettings(); Chip.sfx("ui"); syncChrome(); }
+      if (ui.resetProg && hitBtn(ui.resetProg, p.x, p.y)) { overlay = "confirmReset"; Chip.sfx("ui"); }
+      if (ui.backSettings && hitBtn(ui.backSettings, p.x, p.y)) {
+        overlay = overlayFrom === "pause" ? "pause" : null;
+        Chip.sfx("ui");
+        syncChrome();
+      }
+    }
+  }
+
   function setMode(m) {
     state.mode = m;
+    if (m !== "play" && m !== "intro") overlay = null;
     syncChrome();
   }
 
   function syncChrome() {
     const pad = document.getElementById("pad");
     const bar = document.getElementById("codeBar");
-    const playing = state.mode === "play" || state.mode === "intro";
-    if (pad) pad.style.display = (hideChromeFlag || !playing) ? "none" : "";
+    const playing = (state.mode === "play" || state.mode === "intro") && !isFrozen();
+    if (pad) pad.style.display = (hideChromeFlag || !playing || !settings.touch) ? "none" : "";
     if (bar) bar.style.display = (!hideChromeFlag && state.mode === "shop") ? "flex" : "none";
     if (state.mode !== "shop") {
       const inp = document.getElementById("codeInput");
@@ -2239,6 +2574,7 @@ html, body {
     if (ui.play && hitBtn(ui.play, p.x, p.y)) { startLevel(selectedLevel); return; }
     if (ui.shop && hitBtn(ui.shop, p.x, p.y)) { Chip.init(); Chip.sfx("ui"); setMode("shop"); return; }
     if (ui.locker && hitBtn(ui.locker, p.x, p.y)) { Chip.init(); Chip.sfx("ui"); setMode("locker"); return; }
+    if (ui.settings && hitBtn(ui.settings, p.x, p.y)) { Chip.init(); Chip.sfx("ui"); overlay = "settings"; overlayFrom = "title"; return; }
     if (ui.art && hitBtn(ui.art, p.x, p.y)) { openLink(ART_LINK); return; }
     for (let i = 1; i <= 3; i++) {
       const b = ui["lv" + i];
@@ -2397,9 +2733,21 @@ html, body {
       }
       return;
     }
+    if (e.code === "Escape") {
+      e.preventDefault();
+      handleEscape();
+      return;
+    }
+    if (e.code === "KeyP") {
+      e.preventDefault();
+      if (overlay === "pause") resumeGame();
+      else if (!overlay && (state.mode === "play" || state.mode === "intro")) pauseGame();
+      return;
+    }
+    if (overlay) return;
     if (e.code === "KeyM") {
       Chip.muted = !Chip.muted;
-      if (Chip.music) Chip.music.gain.value = Chip.muted ? 0 : 0.32;
+      Chip.applyAudio();
       return;
     }
     if (e.code === "Space" || e.code === "Enter") {
@@ -2435,11 +2783,15 @@ html, body {
   canvas.addEventListener("pointerdown", function (e) {
     Chip.init();
     const p = viewPos(e);
+    if (overlay) { handleOverlay(p); return; }
     if (state.mode === "title") handleTitle(p);
     else if (state.mode === "shop") handleShop(p);
     else if (state.mode === "locker") handleLocker(p);
     else if (state.mode === "victory") handleVictory(p);
-    else if (state.mode === "intro") introT = 0;
+    else if (state.mode === "play" || state.mode === "intro") {
+      if (ui.pause && hitBtn(ui.pause, p.x, p.y)) { pauseGame(); return; }
+      if (state.mode === "intro") introT = 0;
+    }
   });
 
   document.addEventListener("touchmove", function (e) {
@@ -2447,6 +2799,15 @@ html, body {
     e.preventDefault();
   }, { passive: false });
 
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden && !overlay && (state.mode === "play" || state.mode === "intro")) {
+      overlay = "pause";
+      overlayFrom = "pause";
+      input.left = false; input.right = false; input.jump = false; input.swipe = false;
+      pressed.jump = false; pressed.swipe = false;
+      syncChrome();
+    }
+  });
   window.addEventListener("resize", resize);
   window.addEventListener("orientationchange", function () { setTimeout(resize, 180); });
 
@@ -2559,6 +2920,20 @@ html, body {
     owns: owns,
     tryPreview: function () { startTryIt(); },
     setShopTab: function (tab, index) { shopTab = tab || shopTab; shopIndex = index || 0; tryIt.on = false; tryFx.length = 0; },
+    pause: pauseGame,
+    resume: resumeGame,
+    openSettings: function (from) { overlay = "settings"; overlayFrom = from || "title"; },
+    isPaused: function () { return isFrozen(); },
+    getSettings: function () { return Object.assign({}, settings); },
+    setSettings: function (s) { Object.assign(settings, s || {}); writeSettings(); Chip.applyAudio(); syncChrome(); },
+    setEquipped: function (partial) { Object.assign(save.equipped, partial || {}); },
+    setPlayer: function (x, y) {
+      if (x != null) player.x = x;
+      if (y != null) player.y = y;
+      player.vx = 0; player.vy = 0; player.grounded = true;
+    },
+    forceFrame: function (name) { debugFrame = name || null; },
+    overlay: function () { return overlay; },
     version: GAME_VER
   };
   window.__SQUEEGEE_VERSION = GAME_VER;
